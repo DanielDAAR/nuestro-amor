@@ -87,7 +87,7 @@ export function PhotoPolaroid({
       <div
         className="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-6 pointer-events-none rounded-t-sm"
         style={{
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0,0 L100,0 L95,20 L5,20 Z\' fill=\'rgba(255,255,255,0.6)\'/%3E%3Cpath d=\'M0,0 L100,0 L95,20 L5,20 Z\' fill=\'none\' stroke=\'rgba(0,0,0,0.05)\' stroke-width=\'0.5\'/%3E%3C/svg\')',
+          backgroundImage: 'var(--background-image-tape-texture)',
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
@@ -98,7 +98,7 @@ export function PhotoPolaroid({
       <div
         className="relative bg-white p-3 pb-8"
         style={{
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'0.03\'/%3E%3C/svg\')',
+          backgroundImage: 'var(--background-image-paper-texture)',
           boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)',
         }}
       >
