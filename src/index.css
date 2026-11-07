@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&family=Caveat:wght@400;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-paper text-ink antialiased;
+    background-image: theme('backgroundImage.paper-texture');
+    font-family: theme('fontFamily.display');
+    margin: 0;
+    min-height: 100vh;
+  }
+  ::selection {
+    @apply bg-heartSoft text-heart;
+  }
+  * {
+    @apply box-border;
+  }
+}
+
+@layer components {
+  .paper-sheet {
+    @apply bg-white shadow-paper relative overflow-hidden;
+    background-image: theme('backgroundImage.paper-texture');
+  }
+  .paper-sheet-lift {
+    @apply shadow-paperLift;
+  }
+  .tape {
+    @apply absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-6 pointer-events-none;
+    background-image: theme('backgroundImage.tape-texture');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .handwritten {
+    @apply font-handwriting text-ink leading-relaxed;
+  }
+  .handwritten-bold {
+    @apply font-handwritingBold text-ink leading-relaxed;
+  }
+  .code-text {
+    @apply font-mono text-xs text-inkLight;
+  }
+  .btn-heart {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-full bg-heart text-white font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-heart/30 active:scale-95 focus:outline-none focus:ring-2 focus:ring-heart focus:ring-offset-2 focus:ring-offset-paper;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 border-heart text-heart font-medium transition-all duration-300 hover:bg-heartSoft hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-heart focus:ring-offset-2 focus:ring-offset-paper;
+  }
+}
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  .rotate-random {
+    @apply rotate-random-1;
+  }
+  .rotate-random:nth-child(2n) { @apply rotate-random-2; }
+  .rotate-random:nth-child(3n) { @apply rotate-random-3; }
+  .rotate-random:nth-child(4n) { @apply rotate-random-4; }
+  .rotate-random:nth-child(5n) { @apply rotate-random-5; }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-paper;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-heart/30 rounded-full hover:bg-heart/50 transition-colors;
+}
+
+/* Animaciones de entrada */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+.animate-fade-in-scale {
+  animation: fadeInScale 0.4s ease-out forwards;
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+/* Partículas flotantes */
+.particle {
+  @apply absolute pointer-events-none;
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Respetar prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
