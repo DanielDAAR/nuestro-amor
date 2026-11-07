@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { ErrorBoundary } from './ErrorBoundary';
 
 import { Sticker } from './Sticker';
 import { PhotoPolaroid } from './PhotoPolaroid';
@@ -23,7 +24,12 @@ import {
   meta,
 } from '../data/memories';
 
-gsap.registerPlugin(ScrollTrigger);
+// Registrar GSAP de forma defensiva
+try {
+  gsap.registerPlugin(ScrollTrigger);
+} catch (e) {
+  console.warn('GSAP ScrollTrigger no disponible:', e);
+}
 
 const SECTION_IDS = [
   'hero',
@@ -76,9 +82,10 @@ export function ScrapbookPage() {
   }, []);
 
   return (
-    <KonamiEasterEgg>
-      {/* Progress bar */}
-      <div className="fixed top-0 left-0 h-1 bg-gradient-to-r from-heart to-accent-1 z-50" style={{ width: '0%' }} ref={progressRef} />
+    <ErrorBoundary>
+      <KonamiEasterEgg>
+        {/* Progress bar */}
+        <div className="fixed top-0 left-0 h-1 bg-gradient-to-r from-heart to-accent-1 z-50" style={{ width: '0%' }} ref={progressRef} />
 
       {/* Navegación lateral */}
       <nav className="fixed left-4 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col gap-2" aria-label="Navegación por secciones">
@@ -444,6 +451,7 @@ export function ScrapbookPage() {
       {/* Scroll spy para actualizar nav */}
       <ScrollSpy sections={SECTION_IDS} onChange={setCurrentSection} />
     </KonamiEasterEgg>
+    </ErrorBoundary>
   );
 }
 

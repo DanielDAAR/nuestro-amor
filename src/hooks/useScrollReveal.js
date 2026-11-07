@@ -1,13 +1,17 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+// Registrar plugin solo una vez
+if (typeof window !== 'undefined' && !gsap.getById('_scrollTriggerRegistered')) {
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.set(ScrollTrigger, { id: '_scrollTriggerRegistered' });
+}
 
 export function useScrollReveal(options = {}) {
   const {
     trigger,
-    start = 'top 80%',
+    start = 'top 85%',
     end = 'bottom 20%',
     scrub = false,
     onEnter,
@@ -18,23 +22,43 @@ export function useScrollReveal(options = {}) {
   } = options;
 
   const elementRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(true); // Default visible por si falla ScrollTrigger
   const tlRef = useRef(null);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     const el = elementRef.current;
-    if (!el) return;
+    if (!el || initializedRef.current) return;
+    initializedRef.current = true;
 
-    // Crear timeline para esta animación
+    // Si ScrollTrigger no está disponible, mantener visible
+    if (!ScrollTrigger) {
+      setIsVisible(true);
+      return;
+    }
+
     tlRef.current = gsap.timeline({
       scrollTrigger: {
         trigger: el,
         start,
         end,
         scrub,
-        onEnter: () => onEnter?.(),
-        onLeave: () => onLeave?.(),
-        onEnterBack: () => onEnterBack?.(),
-        onLeaveBack: () => onLeaveBack?.(),
+        onEnter: () => {
+          setIsVisible(true);
+          onEnter?.();
+        },
+        onLeave: () => {
+          setIsVisible(false);
+          onLeave?.();
+        },
+        onEnterBack: () => {
+          setIsVisible(true);
+          onEnterBack?.();
+        },
+        onLeaveBack: () => {
+          setIsVisible(false);
+          onLeaveBack?.();
+        },
         ...rest,
       },
     });
@@ -44,10 +68,11 @@ export function useScrollReveal(options = {}) {
       ScrollTrigger.getAll().forEach(st => {
         if (st.trigger === el) st.kill();
       });
+      initializedRef.current = false;
     };
   }, [start, end, scrub, onEnter, onLeave, onEnterBack, onLeaveBack]);
 
-  return { ref: elementRef, tl: tlRef.current };
+  return { ref: elementRef, tl: tlRef.current, isVisible };
 }
 
 export function useStaggerReveal(options = {}) {
@@ -61,10 +86,16 @@ export function useStaggerReveal(options = {}) {
 
   const containerRef = useRef(null);
   const tlRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const el = containerRef.current || container;
     if (!el) return;
+
+    if (!ScrollTrigger) {
+      setIsVisible(true);
+      return;
+    }
 
     const items = el.querySelectorAll(children);
     if (!items.length) return;
@@ -73,6 +104,7 @@ export function useStaggerReveal(options = {}) {
       scrollTrigger: {
         trigger: el,
         start,
+        onEnter: () => setIsVisible(true),
         ...rest,
       },
     });
@@ -94,22 +126,16 @@ export function useStaggerReveal(options = {}) {
     };
   }, [container, children, stagger, start]);
 
-  return { ref: containerRef, tl: tlRef.current };
+  return { ref: containerRef, tl: tlRef.current, isVisible };
 }
 
 export function useParallax(options = {}) {
-  const {
-    speed = 0.5,
-    start = 'top bottom',
-    end = 'bottom top',
-    ...rest
-  } = options;
-
+  const { speed = 0.5, start = 'top bottom', end = 'bottom top', ...rest } = options;
   const elementRef = useRef(null);
 
   useEffect(() => {
     const el = elementRef.current;
-    if (!el) return;
+    if (!el || !ScrollTrigger) return;
 
     const st = ScrollTrigger.create({
       trigger: el,

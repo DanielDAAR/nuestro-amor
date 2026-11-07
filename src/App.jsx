@@ -1,8 +1,11 @@
 import { ScrapbookPage } from './components/ScrapbookPage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 function App() {
   return (
-    <ScrapbookPage />
+    <ErrorBoundary>
+      <ScrapbookPage />
+    </ErrorBoundary>
   );
 }
 
