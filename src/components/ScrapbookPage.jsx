@@ -13,7 +13,7 @@ import { FlipCard } from './FlipCard';
 import { MemoryBoard, DraggableMemory } from './DraggableMemory';
 import { KonamiEasterEgg } from './KonamiEasterEgg';
 import { MusicPlayer } from './MusicPlayer';
-import { TerminalLove } from './TerminalLove';
+import { TerminalLove, TerminalButton } from './TerminalLove';
 
 import {
   ourStory,
