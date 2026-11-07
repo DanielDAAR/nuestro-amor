@@ -1,23 +1,567 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Nuestra historia de amor - Un scrapbook digital interactivo hecho con código y mucho ❤️" />
-    <meta name="theme-color" content="#e85d75" />
-    <title>Nuestra Historia, Nuestro Código 💕</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  </head>
-  <body style="background: #fefcf5; color: #2d2d2d; font-family: system-ui, sans-serif; margin: 0;">
-    <noscript>
-      <div style="font-family: system-ui, sans-serif; text-align: center; padding: 50px; background: #fefcf5; color: #2d2d2d;">
-        <h1 style="color: #e85d75;">💕 Nuestra Historia</h1>
-        <p>Por favor, habilita JavaScript para ver la página completa.</p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nuestra Historia, Nuestro Código 💕</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      background: #fefcf5;
+      color: #2d2d2d;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    @import url('https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&family=Caveat:wght@400;700&family=Outfit:wght@300;400;600&display=swap');
+
+    /* ── Utilidades ── */
+    .handwriting { font-family: 'Nothing You Could Do', cursive; }
+    .handwriting-bold { font-family: 'Caveat', cursive; }
+    .mono { font-family: 'Courier New', monospace; }
+    .text-heart { color: #e85d75; }
+    .text-ink { color: #2d2d2d; }
+    .bg-heart { background: #e85d75; }
+    .bg-paper { background: #fefcf5; }
+    .shadow-paper { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.08); }
+    .rotate-3 { transform: rotate(3deg); }
+    .rotate-n3 { transform: rotate(-3deg); }
+
+    /* ── Layout ── */
+    #app { min-height: 100vh; position: relative; }
+    section { padding: 80px 20px; max-width: 800px; margin: 0 auto; }
+
+    /* ── Progreso ── */
+    #progress {
+      position: fixed; top: 0; left: 0; height: 4px;
+      background: linear-gradient(90deg, #e85d75, #ffa8c8);
+      width: 0%; z-index: 9999; transition: width 0.1s;
+    }
+
+    /* ── Nav lateral ── */
+    #nav {
+      position: fixed; left: 20px; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 12px; z-index: 100;
+    }
+    .nav-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid rgba(232,93,117,0.3);
+      background: transparent; cursor: pointer; transition: all 0.3s;
+    }
+    .nav-dot.active { background: #e85d75; border-color: #e85d75; transform: scale(1.3); }
+
+    /* ── Hero ── */
+    #hero {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      text-align: center; padding-top: 80px; position: relative;
+    }
+    .hero-content { max-width: 600px; z-index: 10; }
+    h1 { font-family: 'Outfit', sans-serif; font-size: 3.5rem; font-weight: 300;
+         line-height: 1.1; margin-bottom: 24px; letter-spacing: -0.02em; }
+    .typewriter { display: inline-block; border-right: 2px solid #e85d75;
+                  animation: blink 1s infinite; }
+    @keyframes blink { 0%,100% { border-color: transparent; } 50% { border-color: #e85d75; } }
+    .subtitle { font-family: 'Nothing You Could Do', cursive; font-size: 2rem;
+                color: #e85d75; margin-bottom: 32px; }
+    .names { display: flex; justify-content: center; align-items: center;
+             gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+    .name-card {
+      background: white; padding: 24px 32px; border-radius: 50px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex;
+      flex-direction: column; align-items: center; gap: 8px;
+      border: 2px solid rgba(232,93,117,0.2);
+    }
+    .name-label { font-family: 'Courier New', monospace; font-size: 0.75rem;
+                  color: #888; letter-spacing: 1px; text-transform: uppercase; }
+    .name-val { font-family: 'Caveat', cursive; font-size: 1.75rem; font-weight: 700; }
+    .heart-plus { font-size: 2rem; color: #e85d75; animation: heartbeat 1.5s infinite; }
+    @keyframes heartbeat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+    .start-date { font-family: 'Nothing You Could Do', cursive; font-size: 1.5rem;
+                  color: #666; margin-bottom: 40px; }
+
+    .btn {
+      padding: 16px 40px; border-radius: 50px; border: none;
+      font-size: 1.1rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary { background: #e85d75; color: white; }
+    .btn-primary:hover { transform: scale(1.05); box-shadow: 0 8px 24px rgba(232,93,117,0.4); }
+    .btn-primary:active { transform: scale(0.97); }
+
+    .scroll-indicator {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); }
+                        50% { transform: translateX(-50%) translateY(-10px); } }
+
+    /* ── Partículas ── */
+    .particle {
+      position: absolute; pointer-events: none; font-size: 1.5rem;
+      opacity: 0.3; animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(4deg); }
+    }
+
+    /* ── Timeline ── */
+    #timeline { background: linear-gradient(180deg, #fefcf5 0%, #f5f0e1 100%); }
+    .timeline-line {
+      position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(to bottom, #e85d7540, #e85d7580, #e85d7540);
+      transform: translateX(-50%);
+    }
+    .timeline-entry {
+      position: relative; margin-bottom: 100px; padding-left: 60px;
+      opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out;
+    }
+    .timeline-entry.visible { opacity: 1; transform: translateY(0); }
+    .timeline-dot {
+      position: absolute; left: 0; top: 40px; width: 20px; height: 20px;
+      border-radius: 50%; background: #e85d75; border: 4px solid white;
+      transform: translateX(-50%); box-shadow: 0 0 0 4px #e85d7540;
+    }
+    .timeline-date { font-family: 'Courier New', monospace; font-size: 0.8rem;
+                     color: #e85d75; font-weight: 600; letter-spacing: 1px;
+                     margin-bottom: 8px; }
+    .timeline-title {
+      font-family: 'Caveat', cursive; font-size: 1.75rem; font-weight: 700;
+      margin-bottom: 8px; color: #2d2d2d;
+    }
+    .timeline-desc { font-size: 1.1rem; line-height: 1.6; color: #555; }
+    .timeline-sticker { font-size: 2rem; position: absolute; right: -40px; top: 20px; }
+
+    /* ── Cartas ── */
+    .letters-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px; margin-top: 40px;
+    }
+    .envelope {
+      background: #e85d75; border-radius: 20px; padding: 20px;
+      cursor: pointer; position: relative; transition: transform 0.3s;
+      min-height: 200px; display: flex; flex-direction: column;
+      justify-content: space-between;
+    }
+    .envelope:hover { transform: translateY(-5px); }
+    .envelope-content { display: none; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3); }
+    .envelope.open .envelope-content { display: block; }
+    .envelope-title {
+      font-family: 'Caveat', cursive; font-size: 1.5rem; color: white;
+      margin-bottom: 12px; font-weight: 700;
+    }
+    .envelope-text {
+      font-family: 'Nothing You Could Do', cursive; color: white;
+      font-size: 1.1rem; line-height: 1.6; white-space: pre-wrap;
+    }
+    .envelope-seal {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      width: 24px; height: 24px; background: #c8234c; border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* ── Flip cards ── */
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px; margin-top: 40px;
+    }
+    .flip-card {
+      background: white; border-radius: 20px; height: 320px;
+      perspective: 1000px; cursor: pointer; position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .flip-card-inner {
+      position: relative; width: 100%; height: 100%;
+      text-align: center; transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+    .flip-card-face {
+      position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+      border-radius: 20px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .flip-card-front { background: #fefcf5; }
+    .flip-card-back {
+      background: #fff0f5; transform: rotateY(180deg);
+    }
+    .flip-emoji { font-size: 3rem; margin-bottom: 12px; }
+    .flip-title {
+      font-family: 'Caveat', cursive; font-size: 1.4rem; font-weight: 700;
+      margin-bottom: 8px; color: #2d2d2d;
+    }
+    .flip-desc { font-size: 0.95rem; line-height: 1.5; color: #666; text-align: center; }
+
+    /* ── Bucket list ── */
+    .bucket-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px; margin-top: 40px;
+    }
+    .bucket-card {
+      background: white; border-radius: 16px; padding: 24px;
+      border: 2px solid #fce8ec; cursor: pointer; transition: all 0.3s;
+    }
+    .bucket-card:hover { border-color: #e85d75; transform: translateY(-3px); }
+    .bucket-card.done { border-color: #4ade80; background: #f0fdf4; }
+    .bucket-emoji { font-size: 2.5rem; margin-bottom: 12px; }
+    .bucket-title {
+      font-family: 'Caveat', cursive; font-size: 1.3rem; font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .bucket-desc { font-size: 0.9rem; color: #666; line-height: 1.4; margin-bottom: 16px; }
+    .bucket-btn {
+      padding: 8px 16px; border-radius: 20px; border: none;
+      font-size: 0.85rem; cursor: pointer;
+    }
+    .bucket-btn.done { background: #4ade80; color: white; }
+    .bucket-btn:not(.done) { background: #e85d75; color: white; }
+
+    /* ── Footer ── */
+    #footer { background: #f5f0e1; text-align: center; padding: 80px 20px; }
+    .footer-heart { font-size: 4rem; margin-bottom: 24px; animation: heartbeat 2s infinite; }
+    .footer-title {
+      font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 300;
+      margin-bottom: 32px; color: #2d2d2d;
+    }
+    .footer-note {
+      font-family: 'Nothing You Could Do', cursive; font-size: 1.5rem;
+      color: #e85d75; margin-bottom: 40px; line-height: 1.6;
+    }
+    .footer-tech { font-family: 'Courier New', monospace; font-size: 0.85rem;
+                   color: #888; margin-bottom: 32px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      h1 { font-size: 2.5rem; }
+      .timeline-line { left: 30px; }
+      .timeline-entry { padding-left: 50px; }
+      .timeline-dot { left: 30px; transform: translateX(-50%); }
+      .timeline-sticker { right: -20px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="progress"></div>
+
+  <nav id="nav"></nav>
+
+  <div id="app">
+    <!-- HERO -->
+    <section id="hero">
+      <div class="hero-content">
+        <div class="handwriting text-2xl mb-6" id="typewriter">Nuestra Historia,</div>
+        <div class="subtitle" id="subtitle">Nuestro Código</div>
+        <div class="names">
+          <div class="name-card">
+            <div class="name-label">developer</div>
+            <div class="name-val" id="name1">Daniel</div>
+          </div>
+          <div class="heart-plus">+</div>
+          <div class="name-card">
+            <div class="name-label">musa</div>
+            <div class="name-val" id="name2">Su nombre</div>
+          </div>
+        </div>
+        <div class="start-date">Juntos desde: <span id="start-date">2024-01-01</span></div>
+        <button class="btn btn-primary" onclick="scrollTo('timeline')">Ver nuestra historia →</button>
       </div>
-    </noscript>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+      <div class="scroll-indicator">
+        <svg width="24" height="24" fill="none" stroke="#e85d75" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section id="timeline">
+      <div style="text-align:center; margin-bottom: 60px;">
+        <h2 class="handwriting-bold text-3xl mb-4">Nuestra Historia</h2>
+        <p class="mono text-sm text-ink/60">Cada momento, un commit en nuestro corazón</p>
+      </div>
+      <div class="timeline-line"></div>
+      <div id="timeline-entries"></div>
+    </section>
+
+    <!-- CARTAS -->
+    <section id="letters">
+      <div style="text-align:center; margin-bottom: 60px;">
+        <h2 class="handwriting-bold text-3xl mb-4">Cartas para Ti</h2>
+        <p class="mono text-sm text-ink/60">Click en cada sobre para leer</p>
+      </div>
+      <div class="letters-grid" id="letters-grid"></div>
+    </section>
+
+    <!-- COSAS QUE AMO -->
+    <section id="things-i-love">
+      <div style="text-align:center; margin-bottom: 60px;">
+        <h2 class="handwriting-bold text-3xl mb-4">Cosas que Amo de Ti</h2>
+        <p class="mono text-sm text-ink/60" id="love-count">Total: 0 razones</p>
+      </div>
+      <div class="cards-grid" id="love-cards"></div>
+    </section>
+
+    <!-- BUCKET LIST -->
+    <section id="bucket-list">
+      <div style="text-align:center; margin-bottom: 60px;">
+        <h2 class="handwriting-bold text-3xl mb-4">Nuestro Futuro Juntos</h2>
+        <p class="mono text-sm text-ink/60">Click en las tarjetas para marcar como cumplidas</p>
+      </div>
+      <div class="bucket-grid" id="bucket-grid"></div>
+    </section>
+
+    <!-- FOOTER -->
+    <section id="footer">
+      <div class="footer-heart">💕</div>
+      <div class="footer-title">Esta página es solo una excusa para decirte...</div>
+      <div class="footer-note">Te amo con todo mi código.<br>Eres mi main branch,<br>mi production deploy,<br>mi commit más importante. 💕</div>
+      <div class="footer-tech">Hecho con ❤️ y HTML/CSS/JS • v1.0.0</div>
+    </section>
+  </div>
+
+  <script>
+    // ── Configuración ──
+    const CONFIG = {
+      names: ['Daniel', 'Su nombre'],
+      startDate: '2024-01-01',
+      motto: 'Nuestra historia, nuestro código ❤️'
+    };
+
+    // ── Datos ──
+    const ourStory = [
+      { date: '2024-01-15', title: 'El primer "hola"', desc: 'Ese día en que nos cruzamos y todo cambió.', sticker: '💫' },
+      { date: '2024-02-14', title: 'Primera cita', desc: 'San Valentín. Nervios, risas y la certeza de querer verte otra vez.', sticker: '🌸' },
+      { date: '2024-03-08', title: 'Nuestro primer beso', desc: 'Bajo la lluvia, sin prisa, solo tú y yo.', sticker: '💋' },
+      { date: '2024-04-01', title: 'Nos hicimos novios', desc: 'Te pedí que fueras mi persona favorita. Dijiste que sí.', sticker: '💍' },
+      { date: '2024-07-20', title: 'Primer viaje juntos', desc: 'Maletas listas, mapa en blanco y tú a mi lado.', sticker: '🧳' },
+      { date: '2025-01-15', title: 'Nuestro primer año', desc: '365 días de risas, abrazos y amor incondicional.', sticker: '🎂' },
+    ];
+
+    const letters = [
+      { title: 'Para ti, mi amor', text: 'Mi amor,\n\nDesde que llegaste a mi vida, todo tiene más sentido. Eres mi persona favorita, mi mejor amiga, mi todo.\n\nGracias por cada risa, cada abrazo, cada "te amo" susurrado al oído.\n\nPrometo amarte en cada commit, en cada deploy, en cada versión de nosotros. Eres mi main branch, mi production.\n\nCon todo mi amor,\nTu dev ❤️' },
+      { title: 'Carta abierta', text: 'Hey,\n\nSolo quería que supieras que pienso en ti todo el tiempo. Incluso cuando estoy debuggeando ese bug imposible, mi mente vuelve a ti.\n\nEres mi feature favorita. Mi hot reload en días fríos.\n\nTe amo más de lo que cualquier variable puede almacenar.\n\nTu dev 💕' },
+    ];
+
+    const thingsILove = [
+      'Tu risa cuando ves mis bugs',
+      'Cómo me apoyas en mis proyectos',
+      'Tus ojos cuando hablas de lo que amas',
+      'El olor de tu café por las mañanas',
+      'Cómo te concentras cuando lees',
+      'Tus manos entrelazadas con las mías',
+      'Que seas mi persona favorita',
+      'Nuestras charlas infinitas',
+      'Tu paciencia infinita conmigo',
+      'Cómo haces que todo sea mejor',
+      'Tus mensajes random en el día',
+      'Que me escuches de verdad',
+      'Tus besos sorpresa',
+      'Cómo te ilusionas con lo simple',
+      'Nuestro idioma secreto',
+      'Que seas mi hogar',
+      'Tus consejos sabios',
+      'Cómo cuidas de mí',
+      'Tus playlist compartidas',
+      'Nuestros planes a futuro',
+      'Que confíes en mí',
+      'Tus abrazos largos',
+      'Cómo me haces reír',
+      'Que seas tú, siempre tú',
+      'Nuestro primer "te amo"',
+      'Cada "buenos días" tuyo',
+      'Que me elijas cada día',
+      'Tus ojos brillando',
+      'Nuestras aventuras',
+      'Que seas mi paz',
+      'Todo de ti, simplemente',
+    ];
+
+    const bucketList = [
+      { title: 'Japón en primavera', emoji: '🌸', desc: 'Ver los sakura juntos' },
+      { title: 'Aurora boreal', emoji: '✨', desc: 'Cazar auroras en Islandia' },
+      { title: 'Road trip por la costa', emoji: '🚗', desc: 'Sin destino fijo, solo nosotros' },
+      { title: 'Vivir en otra ciudad', emoji: '🏠', desc: 'Un año en Barcelona o Berlín' },
+      { title: 'Aprender algo juntos', emoji: '📚', desc: 'Cocina, baile, idioma' },
+      { title: 'Nuestro perrito/gatito', emoji: '🐾', desc: 'Adoptar y llenar la casa de patitas' },
+    ];
+
+    // ── Inicialización ──
+    document.getElementById('name1').textContent = CONFIG.names[0];
+    document.getElementById('name2').textContent = CONFIG.names[1];
+    document.getElementById('start-date').textContent = CONFIG.startDate;
+    document.getElementById('love-count').textContent = `Total: ${thingsILove.length} razones`;
+
+    // ── Typewriter ──
+    function typeWriter(elementId, text, speed = 40) {
+      const el = document.getElementById(elementId);
+      let i = 0;
+      el.textContent = '';
+      function type() {
+        if (i < text.length) {
+          el.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed + Math.random() * 30);
+        }
+      }
+      type();
+    }
+
+    // Iniciar typewriter cuando se ve el hero
+    const heroObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        typeWriter('typewriter', 'Nuestra Historia,', 50);
+        setTimeout(() => typeWriter('subtitle', 'Nuestro Código', 50), 800);
+        heroObserver.disconnect();
+      }
+    }, { threshold: 0.1 });
+    heroObserver.observe(document.getElementById('hero'));
+
+    // ── Timeline ──
+    const timelineEl = document.getElementById('timeline-entries');
+    ourStory.forEach((item, index) => {
+      const entry = document.createElement('div');
+      entry.className = 'timeline-entry';
+      entry.innerHTML = `
+        <div class="timeline-dot">${item.sticker}</div>
+        <div class="timeline-date">${item.date}</div>
+        <div class="timeline-title">${item.title}</div>
+        <div class="timeline-desc">${item.desc}</div>
+      `;
+      timelineEl.appendChild(entry);
+    });
+
+    const tlObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 150);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.timeline-entry').forEach(el => tlObserver.observe(el));
+
+    // ── Cartas ──
+    const lettersGrid = document.getElementById('letters-grid');
+    letters.forEach((letter, index) => {
+      const env = document.createElement('div');
+      env.className = 'envelope';
+      env.innerHTML = `
+        <div class="envelope-title">${letter.title}</div>
+        <div class="envelope-content">${letter.text}</div>
+        <div class="envelope-seal">💕</div>
+      `;
+      env.onclick = () => env.classList.toggle('open');
+      lettersGrid.appendChild(env);
+    });
+
+    // ── Cosas que amo ──
+    const loveCards = document.getElementById('love-cards');
+    thingsILove.forEach((thing, index) => {
+      const card = document.createElement('div');
+      card.className = 'flip-card';
+      card.innerHTML = `
+        <div class="flip-card-inner">
+          <div class="flip-card-face flip-card-front">
+            <div class="flip-emoji">💖</div>
+            <div class="flip-title">${thing}</div>
+          </div>
+          <div class="flip-card-face flip-card-back">
+            <div class="flip-emoji">✨</div>
+            <div class="flip-title">Razón #${index + 1}</div>
+            <div class="flip-desc">Una de las ${thingsILove.length} razones por las que te amo.</div>
+          </div>
+        </div>
+      `;
+      card.onclick = () => card.classList.toggle('flipped');
+      loveCards.appendChild(card);
+    });
+
+    // ── Bucket list ──
+    const bucketGrid = document.getElementById('bucket-grid');
+    bucketList.forEach((item) => {
+      const card = document.createElement('div');
+      card.className = 'bucket-card';
+      card.innerHTML = `
+        <div class="bucket-emoji">${item.emoji}</div>
+        <div class="bucket-title">${item.title}</div>
+        <div class="bucket-desc">${item.desc}</div>
+        <button class="bucket-btn" onclick="toggleBucket(this, '${item.title}')">Marcar como hecho ✓</button>
+      `;
+      bucketGrid.appendChild(card);
+    });
+
+    window.toggleBucket = function(btn, title) {
+      const card = btn.closest('.bucket-card');
+      card.classList.toggle('done');
+      btn.textContent = card.classList.contains('done') ? '¡CUMPLIDO! 🎉' : 'Marcar como hecho ✓';
+      btn.classList.toggle('done');
+    };
+
+    // ── Scroll progress ──
+    window.onscroll = () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progress').style.width = scrolled + '%';
+
+      // Actualizar nav activa
+      const sections = ['hero', 'timeline', 'letters', 'things-i-love', 'bucket-list', 'footer'];
+      const dots = document.querySelectorAll('.nav-dot');
+      sections.forEach((sec, i) => {
+        const el = document.getElementById(sec);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 150 && rect.bottom >= 150) {
+            dots.forEach(d => d.classList.remove('active'));
+            dots[i].classList.add('active');
+          }
+        }
+      });
+    };
+
+    // ── Nav dots ──
+    const nav = document.getElementById('nav');
+    sections = ['hero', 'timeline', 'letters', 'things-i-love', 'bucket-list', 'footer'];
+    const labels = ['Inicio', 'Historia', 'Cartas', 'Amo de ti', 'Futuro', 'Final'];
+    sections.forEach((id, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+      dot.title = labels[i];
+      dot.onclick = () => scrollTo(id);
+      nav.appendChild(dot);
+    });
+
+    window.scrollTo = function(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // ── Partículas flotantes ──
+    function createParticles() {
+      const emojis = ['💕', '✨', '💖', '🌸', '💫', '🦋', '🌙', '⭐'];
+      for (let i = 0; i < 15; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.top = Math.random() * 100 + 'vh';
+        p.style.animationDelay = Math.random() * 5 + 's';
+        p.style.animationDuration = (8 + Math.random() * 10) + 's';
+        document.body.appendChild(p);
+      }
+    }
+    createParticles();
+
+    // ── Contador de días ──
+    function updateDaysCounter() {
+      const start = new Date(CONFIG.startDate);
+      const now = new Date();
+      const days = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+      const el = document.getElementById('start-date');
+      if (el) el.innerHTML = `Juntos desde: <strong>${CONFIG.startDate}</strong> <span class="mono">${days} días juntos</span>`;
+    }
+    updateDaysCounter();
+    setInterval(updateDaysCounter, 86400000);
+  </script>
+</body>
 </html>
