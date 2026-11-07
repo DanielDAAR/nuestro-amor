@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { useScrollReveal } from '../hooks/useScrollReveal';
@@ -75,10 +75,10 @@ export function DraggableMemory({
     };
   }, [bounds, onDrop, onPositionChange, id, position.x, position.y]);
 
-  const combinedRef = (el) => {
+  const combinedRef = useCallback((el) => {
     elementRef.current = el;
     revealRef(el);
-  };
+  }, [revealRef]);
 
   const renderContent = () => {
     switch (type) {

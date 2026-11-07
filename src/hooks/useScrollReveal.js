@@ -1,12 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// Registrar plugin solo una vez
-if (typeof window !== 'undefined' && !gsap.getById('_scrollTriggerRegistered')) {
-  gsap.registerPlugin(ScrollTrigger);
-  gsap.set(ScrollTrigger, { id: '_scrollTriggerRegistered' });
-}
+let scrollTriggerRegistered = false;
 
 export function useScrollReveal(options = {}) {
   const {
@@ -22,20 +18,48 @@ export function useScrollReveal(options = {}) {
   } = options;
 
   const elementRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(true); // Default visible por si falla ScrollTrigger
+  const [isVisible, setIsVisible] = useState(true);
   const tlRef = useRef(null);
-  const initializedRef = useRef(false);
 
+  // Registrar ScrollTrigger una sola vez
+  useEffect(() => {
+    if (!scrollTriggerRegistered && typeof window !== 'undefined') {
+      try {
+        gsap.registerPlugin(ScrollTrigger);
+        scrollTriggerRegistered = true;
+      } catch (e) {
+        console.warn('GSAP ScrollTrigger no disponible:', e);
+      }
+    }
+  }, []);
+
+  // Crear la animación una sola vez usando un ref estable
   useEffect(() => {
     const el = elementRef.current;
-    if (!el || initializedRef.current) return;
-    initializedRef.current = true;
+    if (!el || tlRef.current) return;
 
-    // Si ScrollTrigger no está disponible, mantener visible
     if (!ScrollTrigger) {
       setIsVisible(true);
       return;
     }
+
+    // Callback refs estables - no recrear en cada render
+    const handleEnter = () => {
+      setIsVisible(true);
+      onEnter?.();
+    };
+    const handleLeave = () => {
+      setIsVisible(false);
+      onLeave?.();
+    };
+    const handleEnterBack = () => {
+      setIsVisible(true);
+      onEnterBack?.();
+    };
+    const handleLeaveBack = () => {
+      setIsVisible(false);
+      onLeaveBack?.();
+    };
 
     tlRef.current = gsap.timeline({
       scrollTrigger: {
@@ -43,34 +67,22 @@ export function useScrollReveal(options = {}) {
         start,
         end,
         scrub,
-        onEnter: () => {
-          setIsVisible(true);
-          onEnter?.();
-        },
-        onLeave: () => {
-          setIsVisible(false);
-          onLeave?.();
-        },
-        onEnterBack: () => {
-          setIsVisible(true);
-          onEnterBack?.();
-        },
-        onLeaveBack: () => {
-          setIsVisible(false);
-          onLeaveBack?.();
-        },
+        onEnter: handleEnter,
+        onLeave: handleLeave,
+        onEnterBack: handleEnterBack,
+        onLeaveBack: handleLeaveBack,
         ...rest,
       },
     });
 
     return () => {
       tlRef.current?.kill();
+      tlRef.current = null;
       ScrollTrigger.getAll().forEach(st => {
         if (st.trigger === el) st.kill();
       });
-      initializedRef.current = false;
     };
-  }, [start, end, scrub, onEnter, onLeave, onEnterBack, onLeaveBack]);
+  }, []); // Dependencias vacías - crear una sola vez
 
   return { ref: elementRef, tl: tlRef.current, isVisible };
 }
@@ -90,7 +102,7 @@ export function useStaggerReveal(options = {}) {
 
   useEffect(() => {
     const el = containerRef.current || container;
-    if (!el) return;
+    if (!el || tlRef.current) return;
 
     if (!ScrollTrigger) {
       setIsVisible(true);
@@ -120,11 +132,12 @@ export function useStaggerReveal(options = {}) {
 
     return () => {
       tlRef.current?.kill();
+      tlRef.current = null;
       ScrollTrigger.getAll().forEach(st => {
         if (st.trigger === el) st.kill();
       });
     };
-  }, [container, children, stagger, start]);
+  }, []);
 
   return { ref: containerRef, tl: tlRef.current, isVisible };
 }
@@ -150,7 +163,7 @@ export function useParallax(options = {}) {
     });
 
     return () => st.kill();
-  }, [speed, start, end]);
+  }, []);
 
   return { ref: elementRef };
 }
