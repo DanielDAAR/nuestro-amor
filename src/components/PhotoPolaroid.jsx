@@ -15,7 +15,7 @@ export function PhotoPolaroid({
   draggable = false,
   bounds,
   onClick,
-  initiallyVisible = false,
+  visible = true,
   revealDelay = 0,
 }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -60,11 +60,13 @@ export function PhotoPolaroid({
     }
   };
 
+  if (!visible) return null;
+
   return (
     <div
       ref={el => { ref(el); revealRef(el); imgRef.current = el; }}
       className={`
-        relative inline-block cursor-pointer transition-all duration-300
+        relative inline-block cursor-pointer transition-card
         shadow-paper ${lifted || isHovered ? 'shadow-paperLift scale-105 z-20' : ''}
         ${draggable ? 'active:cursor-grabbing' : ''}
         ${isExpanded ? 'z-50 fixed inset-0 m-auto max-w-2xl max-h-[80vh]' : ''}
@@ -139,7 +141,7 @@ export function PhotoPolaroid({
       {/* Overlay al expandir */}
       {isExpanded && (
         <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998] animate-fade-in"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998]"
           onClick={() => setIsExpanded(false)}
           aria-hidden="true"
         />
@@ -156,6 +158,7 @@ export function PhotoGrid({ photos, className = '', ...props }) {
           key={photo.id || index}
           {...photo}
           revealDelay={index * 0.1}
+          className={`stagger-${(index % 5) + 1}`}
         />
       ))}
     </div>

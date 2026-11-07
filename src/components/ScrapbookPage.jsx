@@ -39,6 +39,7 @@ const SECTION_IDS = [
 export function ScrapbookPage() {
   const [currentSection, setCurrentSection] = useState(0);
   const [showTerminal, setShowTerminal] = useState(false);
+  const [memoryBoardElement, setMemoryBoardElement] = useState(null);
   const sectionRefs = useRef({});
   const progressRef = useRef(null);
 
@@ -200,8 +201,13 @@ export function ScrapbookPage() {
               Juntos desde: {meta.startDate}
             </HandwrittenNote>
 
+            {/* CTA principal */}
+            <button className="btn-primary stagger-1 mt-12" onClick={() => scrollToSection(1)}>
+              Ver nuestra historia →
+            </button>
+
             {/* Scroll indicator */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce stagger-2">
               <svg className="w-8 h-8 text-heart/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
@@ -296,7 +302,7 @@ export function ScrapbookPage() {
 
         {/* MEMORY BOARD - DRAG & DROP */}
         <section
-          ref={(el) => { sectionRefs.current['memory-board'] = el; }}
+          ref={el => { sectionRefs.current['memory-board'] = el; setMemoryBoardElement(el); }}
           id="memory-board"
           className="relative py-20 px-4 bg-gradient-to-b from-paper to-paperDark/50"
         >
@@ -316,7 +322,7 @@ export function ScrapbookPage() {
                 { id: 'mem-5', type: 'photo', src: '/images/memory2.jpg', caption: 'Atardecer juntos', sticker: '🌅', position: { x: -180, y: 180, rotation: -2 } },
                 { id: 'mem-6', type: 'note', note: 'Gracias por ser mi persona favorita 💕', sticker: '📝', position: { x: 120, y: 150, rotation: 3 } },
               ]}
-              bounds=".relative.py-20"
+              bounds={memoryBoardElement}
               className="min-h-[500px]"
             />
           </div>

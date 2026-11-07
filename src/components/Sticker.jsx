@@ -21,6 +21,7 @@ export function Sticker({
   shadow = 'paper',
   onClick,
   style,
+  visible = true,
   ...props
 }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -56,11 +57,13 @@ export function Sticker({
     setLifted(false);
   };
 
+  if (!visible) return null;
+
   return (
     <div
       ref={ref}
       className={`
-        relative inline-block cursor-pointer transition-all duration-300
+        relative inline-block cursor-pointer transition-card
         ${shadow === 'paper' ? 'shadow-paper' : ''}
         ${shadow === 'paperLift' ? 'shadow-paperLift' : ''}
         ${lifted || isHovered ? 'shadow-paperLift scale-105 z-10' : ''}

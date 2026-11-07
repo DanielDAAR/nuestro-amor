@@ -15,7 +15,7 @@ export function DraggableMemory({
   note = '',
   sticker = '📎',
   position = { x: 0, y: 0, rotation: 0 },
-  bounds,
+  bounds, // Element | string | null
   onDrop,
   onPositionChange,
   className = '',

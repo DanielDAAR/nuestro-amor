@@ -24,7 +24,7 @@ export function FlipCard({
     onEnter: () => {
       gsap.fromTo(cardRef.current,
         { opacity: 0, y: 40, scale: 0.95 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.2)' }
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' }
       );
     },
   });
@@ -48,7 +48,6 @@ export function FlipCard({
     });
   };
 
-  // Auto-flip
   useEffect(() => {
     if (!autoFlip) return;
     intervalRef.current = setInterval(() => {
@@ -57,7 +56,6 @@ export function FlipCard({
     return () => clearInterval(intervalRef.current);
   }, [autoFlip, flipInterval, isFlipping, flip]);
 
-  // Pausar auto-flip al hover
   const handleMouseEnter = () => {
     if (autoFlip && intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -190,6 +188,7 @@ export function FlipCardGrid({ cards, className = '', columns = 3, ...props }) {
           key={card.id || index}
           id={index + 1}
           {...card}
+          className={`stagger-${(index % 5) + 1}`}
         />
       ))}
     </div>

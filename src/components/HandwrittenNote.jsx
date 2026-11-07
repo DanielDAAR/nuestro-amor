@@ -24,8 +24,10 @@ export function HandwrittenNote({
   onComplete,
   draggable = false,
   bounds,
+  visible = true,
 }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(visible);
   const noteRef = useRef(null);
   const rotationRef = useRef(rotation ?? ROTATIONS[Math.floor(Math.random() * ROTATIONS.length)]);
   const paper = PAPER_TYPES[paperType % PAPER_TYPES.length];
@@ -34,6 +36,7 @@ export function HandwrittenNote({
     trigger: noteRef.current,
     start: 'top 85%',
     onEnter: () => {
+      setIsVisible(true);
       gsap.fromTo(noteRef.current,
         { opacity: 0, y: 30, rotation: rotationRef.current + 5, scale: 0.95 },
         { opacity: 1, y: 0, rotation: rotationRef.current, scale: 1, duration: 0.7, ease: 'power2.out' }
@@ -60,11 +63,13 @@ export function HandwrittenNote({
     revealRef(el);
   };
 
+  if (!isVisible) return null;
+
   return (
     <div
       ref={combinedRef}
       className={`
-        relative inline-block transition-all duration-300
+        relative inline-block transition-card
         ${paper.bg} ${paper.border} ${paper.shadow} ${paper.border ? 'border-2' : ''}
         rounded-lg p-6 min-w-[200px] max-w-[400px]
         ${isHovered ? 'shadow-paperLift scale-[1.02] z-10' : ''}
@@ -132,7 +137,7 @@ export function NoteStack({ notes, className = '', ...props }) {
           {...note}
           paperType={index}
           rotation={note.rotation ?? ROTATIONS[index % ROTATIONS.length]}
-          animated={index === 0} // Solo animar la primera, las otras al hacer hover
+          animated={index === 0}
         />
       ))}
     </div>
