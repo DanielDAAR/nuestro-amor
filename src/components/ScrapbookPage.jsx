@@ -1,7 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useState, useEffect } from 'react';
 import { ErrorBoundary } from './ErrorBoundary';
 
 import { Sticker } from './Sticker';
@@ -25,13 +22,6 @@ import {
   memoryBoardItems,
 } from '../data/memories';
 
-// Registrar GSAP de forma defensiva
-try {
-  gsap.registerPlugin(ScrollTrigger);
-} catch (e) {
-  console.warn('GSAP ScrollTrigger no disponible:', e);
-}
-
 const SECTION_IDS = [
   'hero',
   'timeline',
@@ -46,39 +36,26 @@ const SECTION_IDS = [
 export function ScrapbookPage() {
   const [currentSection, setCurrentSection] = useState(0);
   const [showTerminal, setShowTerminal] = useState(false);
-  const progressRef = useRef(null);
+  const [scrollY, setScrollY] = useState(0);
 
-  // Scroll progress indicator
+  // Scroll progress
   useEffect(() => {
-    const updateProgress = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      if (progressRef.current) {
-        progressRef.current.style.width = `${Math.min(100, Math.max(0, progress))}%`;
-      }
-    };
-
-    window.addEventListener('scroll', updateProgress, { passive: true });
-    updateProgress();
-    return () => window.removeEventListener('scroll', updateProgress);
+    const updateScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', updateScroll, { passive: true });
+    updateScroll();
+    return () => window.removeEventListener('scroll', updateScroll);
   }, []);
 
-  // Smooth scroll to section por ID
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Scroll restoration
   useEffect(() => {
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual';
-    }
     window.scrollTo(0, 0);
   }, []);
+
+  const progress = Math.min(100, Math.max(0, (scrollY / 2000) * 100));
 
   return (
     <ErrorBoundary>
@@ -86,25 +63,23 @@ export function ScrapbookPage() {
         {/* Progress bar */}
         <div
           className="fixed top-0 left-0 h-1 bg-gradient-to-r from-heart to-accent-1 z-50"
-          style={{ width: '0%' }}
-          ref={progressRef}
+          style={{ width: `${progress}%` }}
         />
 
         {/* Navegación lateral */}
-        <nav className="fixed left-4 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col gap-2" aria-label="Navegación por secciones">
-          {SECTION_IDS.map((id, index) => (
+        <nav className="fixed left-4 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col gap-2" aria-label="Navegación">
+          {SECTION_IDS.map((id) => (
             <button
               key={id}
               onClick={() => scrollToSection(id)}
               className={`
                 w-3 h-3 rounded-full border-2 transition-all duration-300
-                ${currentSection === index
+                ${currentSection === id
                   ? 'bg-heart border-heart scale-125'
                   : 'border-white/50 hover:border-heart hover:scale-110'
-                }
-              `}
+              }`}
               aria-label={`Ir a ${id}`}
-              aria-current={currentSection === index ? 'true' : 'false'}
+              aria-current={currentSection === id ? 'true' : 'false'}
             />
           ))}
         </nav>
@@ -213,11 +188,10 @@ export function ScrapbookPage() {
             </div>
           </section>
 
-          {/* TIMELINE - NUESTRA HISTORIA */}
+          {/* TIMELINE */}
           <section id="timeline" className="relative py-20 px-4 bg-gradient-to-b from-paper to-paperDark/50">
             <div className="max-w-4xl mx-auto">
               <SectionHeader title="Nuestra Historia" sticker="📖" />
-
               <Timeline entries={ourStory.map((entry, i) => ({ ...entry, index: i }))} />
             </div>
           </section>
@@ -226,10 +200,9 @@ export function ScrapbookPage() {
           <section id="letters" className="relative py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <SectionHeader title="Cartas para Ti" sticker="💌" subtitle="Click en cada sobre para leer" />
-
               <div className="flex flex-wrap gap-8 justify-center mt-12">
-                {letters.map((letter, index) => (
-                  <EnvelopeLetter key={letter.id} {...letter} className="transition-all duration-500 hover:z-10" />
+                {letters.map((letter) => (
+                  <EnvelopeLetter key={letter.id} {...letter} />
                 ))}
               </div>
             </div>
@@ -243,7 +216,6 @@ export function ScrapbookPage() {
                 sticker="💖"
                 subtitle={`Total: ${thingsILove.length} razones (y contando...)`}
               />
-
               <FlipCardGrid
                 cards={thingsILove.map((thing, index) => ({
                   id: index + 1,
@@ -256,7 +228,7 @@ export function ScrapbookPage() {
             </div>
           </section>
 
-          {/* BUCKET LIST - FUTURO JUNTOS */}
+          {/* BUCKET LIST */}
           <section id="bucket-list" className="relative py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <SectionHeader
@@ -264,7 +236,6 @@ export function ScrapbookPage() {
                 sticker="🌍"
                 subtitle="Click en las tarjetas para marcar como cumplidas"
               />
-
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-12">
                 {bucketList.map((item, index) => (
                   <BucketListCard key={item.id} item={item} index={index} />
@@ -273,34 +244,31 @@ export function ScrapbookPage() {
             </div>
           </section>
 
-          {/* MEMORY BOARD - DRAG & DROP */}
+          {/* MEMORY BOARD */}
           <section id="memory-board" className="relative py-20 px-4 bg-gradient-to-b from-paper to-paperDark/50">
             <div className="max-w-5xl mx-auto">
               <SectionHeader
                 title="Tablero de Recuerdos"
                 sticker="📌"
-                subtitle="Arrastra fotos, notas y stickers. ¡Organiza tu scrapbook!"
+                subtitle="Arrastra fotos, notas y stickers."
               />
-
-              <MemoryBoard memories={memoryBoardItems} bounds={null} className="min-h-[500px]" />
+              <MemoryBoard memories={memoryBoardItems} className="min-h-[500px]" />
             </div>
           </section>
 
-          {/* TERMINAL - RINCÓN DEV */}
+          {/* TERMINAL */}
           <section id="terminal" className="relative py-20 px-4 bg-gray-950">
             <div className="max-w-4xl mx-auto">
               <SectionHeader
                 title="Rincón de Developer 💻"
                 sticker="⌨️"
-                subtitle="Comandos románticos para tu terminal del corazón"
+                subtitle="Comandos románticos"
                 titleColor="text-green-400"
                 stickerColor="text-green-400"
               />
-
               <div className="mt-12">
                 <TerminalLove startDate={meta.startDate} initialCommands={['git commit -m "te amo"', 'npm install love --save']} />
               </div>
-
               <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {devEasterEggs.slice(0, 4).map((egg, index) => (
                   <DevCommandCard key={egg.command} command={egg.command} response={egg.response} />
@@ -312,13 +280,7 @@ export function ScrapbookPage() {
           {/* FOOTER */}
           <section id="footer" className="relative py-20 px-4 bg-paperDark">
             <div className="max-w-4xl mx-auto text-center">
-              <Sticker
-                tape={false}
-                shadow="none"
-                draggable={false}
-                rotation={0}
-                className="mb-8"
-              >
+              <Sticker tape={false} shadow="none" draggable={false} rotation={0} className="mb-8">
                 <span className="text-6xl animate-heartbeat">💕</span>
               </Sticker>
 
@@ -340,27 +302,14 @@ export function ScrapbookPage() {
               </HandwrittenNote>
 
               <div className="flex items-center justify-center gap-8 flex-wrap mb-12">
-                <Sticker
-                  className="min-w-[120px]"
-                  tape={true}
-                  shadow="paper"
-                  draggable={false}
-                  rotation={-1}
-                >
+                <Sticker className="min-w-[120px]" tape={true} shadow="paper" draggable={false} rotation={-1}>
                   <div className="text-center">
                     <p className="font-mono text-xs text-inkLight/60">Hecho con</p>
                     <p className="text-3xl">💕</p>
                     <p className="font-mono text-xs text-inkLight/60">y React + GSAP</p>
                   </div>
                 </Sticker>
-
-                <Sticker
-                  className="min-w-[120px]"
-                  tape={true}
-                  shadow="paper"
-                  draggable={false}
-                  rotation={1}
-                >
+                <Sticker className="min-w-[120px]" tape={true} shadow="paper" draggable={false} rotation={1}>
                   <div className="text-center">
                     <p className="font-mono text-xs text-inkLight/60">Para</p>
                     <p className="font-handwritingBold text-ink text-lg">{meta.names[1]}</p>
@@ -417,9 +366,7 @@ function useTypewriterLines(lines, options) {
       setAllComplete(true);
       return;
     }
-    const timer = setTimeout(() => {
-      setCurrentLineIndex(prev => prev + 1);
-    }, options.lineDelay || 800);
+    const timer = setTimeout(() => setCurrentLineIndex(prev => prev + 1), options.lineDelay || 800);
     return () => clearTimeout(timer);
   }, [currentLineIndex, lines.length, options.lineDelay]);
 
@@ -458,14 +405,7 @@ function FlipCardGrid({ cards, columns = 2, className = '' }) {
 function BucketListCard({ item, index }) {
   const [done, setDone] = useState(item.done);
 
-  const toggleDone = () => {
-    setDone(!done);
-    gsap.fromTo(
-      `.bucket-card-${item.id}`,
-      { scale: 1 },
-      { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1, ease: 'power2.out' }
-    );
-  };
+  const toggleDone = () => setDone(!done);
 
   return (
     <div className={`bucket-card-${item.id} relative group`}>
@@ -544,19 +484,15 @@ function ScrollSpy({ sections, onChange }) {
     const observers = sections.map((id, index) => {
       const el = document.getElementById(id);
       if (!el) return null;
-
       const observer = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) onChange(index); },
+        ([entry]) => { if (entry.isIntersecting) onChange(id); },
         { rootMargin: '-20% 0px -60% 0px', threshold: 0.1 }
       );
-
       observer.observe(el);
       return observer;
     });
-
     return () => observers.forEach(obs => obs?.disconnect());
   }, [sections, onChange]);
-
   return null;
 }
 

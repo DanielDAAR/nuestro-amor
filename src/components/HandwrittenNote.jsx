@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useTypewriter } from '../hooks/useTypewriter';
 import { useScrollReveal } from '../hooks/useScrollReveal';
@@ -35,33 +35,22 @@ export function HandwrittenNote({
   const { ref: revealRef } = useScrollReveal({
     trigger: noteRef.current,
     start: 'top 85%',
-    onEnter: () => {
-      setIsVisible(true);
-      gsap.fromTo(noteRef.current,
-        { opacity: 0, y: 30, rotation: rotationRef.current + 5, scale: 0.95 },
-        { opacity: 1, y: 0, rotation: rotationRef.current, scale: 1, duration: 0.7, ease: 'power2.out' }
-      );
-    },
+    onEnter: () => setIsVisible(true),
   });
 
   const textContent = typeof children === 'string' ? children : '';
   const { text, isComplete, showCursor, cursorChar, start, reset } = useTypewriter(textContent, {
-    speed,
-    delay,
-    onComplete,
-    cursor: animated,
+    speed, delay, onComplete, cursor: animated,
   });
 
   useEffect(() => {
-    if (animated && textContent) {
-      start();
-    }
+    if (animated && textContent) start();
   }, [animated, textContent, start]);
 
-  const combinedRef = (el) => {
+  const combinedRef = useCallback((el) => {
     noteRef.current = el;
     revealRef(el);
-  };
+  }, [noteRef, revealRef]);
 
   if (!isVisible) return null;
 
@@ -75,54 +64,31 @@ export function HandwrittenNote({
         ${isHovered ? 'shadow-paperLift scale-[1.02] z-10' : ''}
         ${className}
       `}
-      style={{
-        rotation: `${rotationRef.current}deg`,
-        transformOrigin: 'center center',
-      }}
+      style={{ rotation: `${rotationRef.current}deg`, transformOrigin: 'center center' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Cinta adhesiva */}
-      <div
-        className="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-6 pointer-events-none rounded-t-sm"
-        style={{
-          backgroundImage: 'var(--background-image-tape-texture)',
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-        }}
-      />
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-6 pointer-events-none rounded-t-sm" style={{
+        backgroundImage: 'var(--background-image-tape-texture)',
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+      }} />
 
-      {/* Contenido con textura de papel */}
-      <div
-        className="relative"
-        style={{
-          backgroundImage: 'var(--background-image-paper-texture)',
-        }}
-      >
-        {title && (
-          <h3 className="font-handwritingBold text-ink text-lg mb-3 pb-2 border-b border-ink/10">
-            {title}
-          </h3>
-        )}
-
+      <div className="relative" style={{ backgroundImage: 'var(--background-image-paper-texture)' }}>
+        {title && <h3 className="font-handwritingBold text-ink text-lg mb-3 pb-2 border-b border-ink/10">{title}</h3>}
         <div className="font-handwriting text-ink leading-relaxed whitespace-pre-wrap">
           {animated && textContent ? (
             <>
               {text}
               {showCursor && <span className="animate-pulse text-heart">{cursorChar}</span>}
             </>
-          ) : (
-            children
-          )}
+          ) : children}
         </div>
       </div>
 
-      {/* Esquina doblada */}
       <div className="absolute bottom-0 right-0 w-0 h-0 border-4 border-transparent border-r-white border-b-white" />
       <div className="absolute bottom-0 right-0 w-0 h-0 border-4 border-transparent border-r-paperDark/50 border-b-paperDark/50" style={{ transform: 'translate(2px, 2px)' }} />
-
-      {/* Grapa decorativa */}
       <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-1.5 border-t-2 border-t-ink/20 rounded-t-full" />
     </div>
   );
@@ -132,13 +98,7 @@ export function NoteStack({ notes, className = '', ...props }) {
   return (
     <div className={`relative ${className}`} {...props}>
       {notes.map((note, index) => (
-        <HandwrittenNote
-          key={note.id || index}
-          {...note}
-          paperType={index}
-          rotation={note.rotation ?? ROTATIONS[index % ROTATIONS.length]}
-          animated={index === 0}
-        />
+        <HandwrittenNote key={note.id || index} {...note} paperType={index} rotation={note.rotation ?? ROTATIONS[index % ROTATIONS.length]} animated={index === 0} />
       ))}
     </div>
   );
