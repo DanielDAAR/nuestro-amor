@@ -2,12 +2,25 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#FFF5F7" />
+<meta name="description" content="Un te amo ingenioso. Ábrelo con el sonido encendido 🎀" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Para ti, Kitzya" />
+<meta property="og:title" content="Para ti, Kitzya 🎀" />
+<meta property="og:description" content="Un te amo ingenioso. Ábrelo con el sonido encendido." />
+<meta property="og:image" content="https://idyllic-wisp-bf5826.netlify.app/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://idyllic-wisp-bf5826.netlify.app/" />
+<meta property="og:locale" content="es_ES" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="format-detection" content="telephone=no" />
 <title>Para ti, Kitzya</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <style>
 /* ══════════════════════════════════════════
    iOS-NATIVE DESIGN SYSTEM · iPhone 14
@@ -342,6 +355,39 @@ section{margin-bottom:28px}
 .sheet-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
 .sheet-sub{font-size:15px;color:var(--label-secondary);text-align:center;margin-bottom:18px}
 
+/* ═════════════════════════════════════════════
+   TU TURNO — ella puede responder
+   ═════════════════════════════════════════════ */
+.reply-card{
+  background:#fff;border-radius:20px;padding:20px 18px 24px;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.1);
+  margin-bottom:14px;
+}
+.reply-last{
+  display:flex;align-items:center;justify-content:space-between;
+  background:#FDEEF4;border-radius:14px;padding:12px 14px;
+  margin-bottom:14px;
+}
+.reply-last-label{font-size:12px;font-weight:600;color:var(--ios-deep);letter-spacing:.5px}
+.reply-last-text{font-size:16px;color:var(--label);overflow-wrap:anywhere}
+.reply-label{display:block;font-size:13px;font-weight:600;color:var(--label-secondary);margin-bottom:8px}
+#replyInput{
+  width:100%;font-size:17px;font-family:inherit;line-height:1.5;
+  border:none;border-radius:12px;background:#F2F2F7;padding:14px 16px;
+  resize:none;outline:none;min-height:96px;color:var(--label);
+  box-shadow:inset 0 0 0 1px rgba(60,60,67,.08);
+}
+#replyInput::placeholder{color:rgba(60,60,67,.35)}
+#replyInput:focus{box-shadow:0 0 0 3px rgba(255,55,95,.18)}
+.reply-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.reply-count{font-size:12px;color:var(--label-tertiary)}
+.btn-small{background:#FF375F;color:#fff;border:none;border-radius:10px;padding:4px 10px;font-size:13px;cursor:pointer}
+.btn-small:active{opacity:.85}
+.reply-toast{font-size:13px;color:var(--ios-deep);margin-top:10px}
+@media (max-width:429px){
+  .reply-card{padding-bottom:calc(var(--safe-bottom) + 20px)}
+}
+
 /* ══ PARTICULAS ══ */
 .pop{position:fixed;pointer-events:none;z-index:9999;font-size:20px;transition:all 1.3s var(--ios-ease)}
 
@@ -465,6 +511,25 @@ footer{
     <div class="fun-grid" id="funGrid"></div>
   </section>
 
+  <!-- ══ TU TURNO ══ -->
+  <section aria-label="Tu turno">
+    <div class="group-header">Tu turno</div>
+    <div class="reply-card">
+      <div class="reply-last" id="replyLast" hidden>
+        <div class="reply-last-label">La última vez me escribiste</div>
+        <div class="reply-last-text" id="replyLastText">—</div>
+        <button class="btn btn-small" id="replyClear" aria-label="Borrar lo escrito">✕</button>
+      </div>
+      <label class="reply-label" for="replyInput">¿Qué me dirías ahora mismo?</label>
+      <textarea id="replyInput" maxlength="140" rows="3" placeholder="Escríbelo aquí…"></textarea>
+      <div class="reply-row">
+        <span class="reply-count" id="replyCount">0/140</span>
+        <button class="btn btn-full" id="btnSend">Enviármelo 💌</button>
+      </div>
+      <div id="replyToast" class="reply-toast" hidden>Enviado. Se abrirá WhatsApp para pegarlo.</div>
+    </div>
+  </section>
+
 </div>
 
 <footer>Hecho con 💕 · solo para ti, Kitzya</footer>
@@ -502,6 +567,17 @@ function ensureAudio(){
   }
   if(ctx.state==='suspended') ctx.resume();
 }
+
+/* guiño dev: mensaje solo para quien abra la consola */
+console.log('%c💕', 'font-size:48px');
+console.log('%cPara ti, Kitzya', 'font-size:20px;font-weight:700;color:#FF375F');
+console.log('%cSi estás leyendo esto, eres la persona más curiosa que conozco.\nY sí: hasta la consola la escribí pensando en ti.', 'font-size:13px;color:#8E4162;line-height:1.6');
+
+/* cuando sale de la pestaña, el título la espera */
+const realTitle = document.title;
+document.addEventListener('visibilitychange', () => {
+  document.title = document.hidden ? '🥺 vuelve' : realTitle;
+});
 
 function bell(freq,dur=.9,vol=.07,when=0){
   ensureAudio();
@@ -815,11 +891,66 @@ function initPhoto(){
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') shut(); });
 }
 
+/* ── Tu turno — respuesta guardada en localStorage + share ── */
+const REPLY_KEY = 'kitzya-reply-v1';
+const replyCard   = document.getElementById('replyLast');
+const replyText   = document.getElementById('replyLastText');
+const replyInput  = document.getElementById('replyInput');
+const replyCount  = document.getElementById('replyCount');
+const btnSend     = document.getElementById('btnSend');
+const btnClear    = document.getElementById('replyClear');
+const replyToast  = document.getElementById('replyToast');
+
+function saveReply(text){
+  try{ localStorage.setItem(REPLY_KEY, JSON.stringify({text, at: Date.now()})); } catch(e){}
+}
+function loadReply(){
+  try{ const raw = localStorage.getItem(REPLY_KEY); if(!raw) return null; return JSON.parse(raw); }
+  catch(e){ return null; }
+}
+function renderReply(){
+  const r = loadReply();
+  if(!r) return;
+  replyCard.hidden = false;
+  replyText.textContent = '«' + r.text + '»';
+}
+function clearReply(){
+  try{ localStorage.removeItem(REPLY_KEY); } catch(e){}
+  replyCard.hidden = true;
+}
+function toastShow(el, ms=2200){
+  el.hidden = false;
+  setTimeout(()=>{ el.hidden = true; }, ms);
+}
+async function sendReply(){
+  const text = (replyInput.value || '').trim();
+  if(!text) return;
+  saveReply(text);                  // síncrono: no rompe el gesto de usuario de share()
+  renderReply();
+  replyInput.value = '';
+  replyCount.textContent = '0/140';
+  if(typeof navigator.share === 'function'){
+    try{ await navigator.share({ title: 'Para ti, Kitzya', text }); return; }
+    catch(e){}                      // canceló o falló
+  }
+  try{ await navigator.clipboard.writeText(text); toastShow(replyToast); }
+  catch(e){}
+}
+
+replyInput.addEventListener('input', () => {
+  const n = replyInput.value.length;
+  replyCount.textContent = n + '/140';
+  btnSend.disabled = n === 0;
+});
+btnClear.addEventListener('click', clearReply);
+btnSend.addEventListener('click', sendReply);
+
 buildGarden();
 buildFun();
 observeGarden();
 initFlowerTouch();
 initPhoto();
+renderReply();
 </script>
 </body>
 </html>
