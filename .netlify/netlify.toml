@@ -7,10 +7,8 @@ redirects = []
 [functions."*"]
 
 [build]
-publish = "C:\\Users\\espec\\OneDrive\\Desktop\\web K\\nuestro-amor\\dist"
-publishOrigin = "ui"
-commandOrigin = "ui"
-command = "npm run build"
+publish = "C:\\Users\\espec\\OneDrive\\Desktop\\web K\\nuestro-amor"
+publishOrigin = "default"
 
 [build.environment]
 
