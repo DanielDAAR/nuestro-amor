@@ -40,6 +40,7 @@
     note: '',
     noteOffline: false,
     wordOpen: false,
+    gamePollTimer: null,  // polling rápido cada 3s cuando hay partida activa
     quizKind: 'conoces',
     quiz: {
       conoces: { data: null, answers: {}, loading: false, saving: false, dirty: false },
@@ -236,9 +237,22 @@
     return [];
   }
 
+  /* ── polling rápido cuando hay partida activa ── */
+  function startGamePoll() {
+    stopGamePoll();
+    mod.gamePollTimer = setInterval(() => {
+      if (mod.ready && !mod.fetching && isActive() && mod.game && mod.game.status === 'open') {
+        load();
+      }
+    }, 3000); // cada 3 s mientras haya partida abierta
+  }
+  function stopGamePoll() {
+    if (mod.gamePollTimer) { clearInterval(mod.gamePollTimer); mod.gamePollTimer = null; }
+  }
+
+  /* ── aplicación de partida (crear o mover) ── */
   function applyGame(game) {
     if (!game || !game.id) return;
-    /* si el estado no cambió (latido), el resalte de la última ficha se queda */
     const diff = diffCells(mod.game, game);
     const sameGame = !!mod.game && mod.game.id === game.id;
     mod.lastCells = diff.length ? diff : (sameGame ? mod.lastCells : []);
@@ -253,6 +267,10 @@
     if (KINDS.indexOf(game.kind) >= 0) mod.kind = game.kind;
     saveCache();
     render();
+
+    /* si hay partida abierta, polling rápido para ver el movimiento del otro */
+    if (game.status === 'open') startGamePoll();
+    else stopGamePoll();
   }
 
   /* ── pintado ── */
@@ -798,6 +816,7 @@
     if (!confirm('¿Borrar esta partida? No se puede deshacer.')) return;
 
     mod.busy = true;
+    stopGamePoll();
     try {
       const res = await PortalAPI('games', { method: 'DELETE', body: { id: game.id } });
       if (res.ok) {
@@ -1198,11 +1217,13 @@
     if (detail.tab === 'juegos') {
       load();
       loadQuiz(mod.quizKind, true);
+    } else {
+      stopGamePoll();
     }
   });
 
   PortalBus.on('portal:heartbeat', () => {
-    if (mod.ready && isActive()) load();
+    if (mod.ready && isActive() && !mod.gamePollTimer) load();
   });
 
   PortalBus.on('portal:auth-lost', () => {
