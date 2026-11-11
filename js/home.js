@@ -239,7 +239,21 @@ function initPhoto(){
    botón enviar nace disabled; estado disabled
    se restablece tras enviar.
    ═════════════════════════════════════════════ */
-const REPLY_KEY = 'kitzya-reply-v1';
+/* FASE 1: cada perfil guarda y comparte con su propia clave.
+   Sin sesión todavía → se comporta como antes (Kitzya). */
+function replyProfile(){
+  try{
+    const s = JSON.parse(localStorage.getItem('portal-session-v1') || 'null');
+    if(s && s.profile) return s.profile;
+  }catch(e){}
+  return 'kitzya';
+}
+function replyKey(){
+  return replyProfile() === 'daniel' ? 'daniel-reply-v1' : 'kitzya-reply-v1';
+}
+function replyShareTitle(){
+  return replyProfile() === 'daniel' ? 'Para ti, Kitzya' : 'Para ti, Daniel';
+}
 const replyCard   = document.getElementById('replyLast');
 const replyText   = document.getElementById('replyLastText');
 const replyInput  = document.getElementById('replyInput');
@@ -249,10 +263,10 @@ const btnClear    = document.getElementById('replyClear');
 const replyToast  = document.getElementById('replyToast');
 
 function saveReply(text){
-  try{ localStorage.setItem(REPLY_KEY, JSON.stringify({text, at: Date.now()})); } catch(e){}
+  try{ localStorage.setItem(replyKey(), JSON.stringify({text, at: Date.now()})); } catch(e){}
 }
 function loadReply(){
-  try{ const raw = localStorage.getItem(REPLY_KEY); if(!raw) return null; return JSON.parse(raw); }
+  try{ const raw = localStorage.getItem(replyKey()); if(!raw) return null; return JSON.parse(raw); }
   catch(e){ return null; }
 }
 function renderReply(){
@@ -262,7 +276,7 @@ function renderReply(){
   replyText.textContent = '«' + r.text + '»';
 }
 function clearReply(){
-  try{ localStorage.removeItem(REPLY_KEY); } catch(e){}
+  try{ localStorage.removeItem(replyKey()); } catch(e){}
   replyCard.hidden = true;
 }
 function toastShow(el, text, ms=2600){
@@ -280,7 +294,7 @@ async function sendReply(){
   replyCount.textContent = '0/140';
   btnSend.disabled = true;          // FIX FASE 0: sin texto, botón deshabilitado
   if(typeof navigator.share === 'function'){
-    try{ await navigator.share({ title: 'Para ti, Kitzya', text }); return; }
+    try{ await navigator.share({ title: replyShareTitle(), text }); return; }
     catch(e){}                      // canceló o falló
   }
   try{

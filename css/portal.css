@@ -1,0 +1,152 @@
+/* ══════════════════════════════════════════════
+   PORTAL · pestañas, pantalla de acceso,
+   presencia, estados vacíos, flor "pensando en ti"
+   (carga después de home.css → sobreescribe
+   el padding del footer por la tab bar)
+   ══════════════════════════════════════════════ */
+
+/* ── Respiro por la tab bar fija ── */
+footer{padding-bottom:calc(var(--safe-bottom) + 74px)}
+
+/* ══ PANTALLA DE ACCESO ══ */
+body.gate-open{overflow:hidden}
+.gate{
+  position:fixed;inset:0;z-index:200;
+  background:var(--bg-grouped);
+  display:flex;align-items:center;justify-content:center;
+  padding:calc(var(--safe-top) + 20px) 24px calc(var(--safe-bottom) + 20px);
+  overflow-y:auto;
+  transition:opacity .4s var(--ios-ease), visibility .4s;
+}
+.gate.is-out{opacity:0;visibility:hidden;pointer-events:none}
+.gate-inner{width:100%;max-width:300px;display:flex;flex-direction:column}
+.gate-heart{
+  width:56px;height:52px;align-self:center;margin-bottom:14px;
+  filter:drop-shadow(0 8px 16px rgba(255,55,95,.35));
+}
+.gate-title{
+  font-family:'Savoye LET','Snell Roundhand','Apple Chancery',cursive;
+  font-size:44px;line-height:1.15;font-weight:400;letter-spacing:.5px;
+  color:var(--ios-deep);text-align:center;margin-bottom:4px;
+}
+.gate-sub{font-size:15px;line-height:20px;color:var(--label-secondary);text-align:center;margin-bottom:30px}
+.gate-label{font-size:13px;font-weight:600;color:var(--label-secondary);margin-bottom:8px}
+.gate-label-profile{margin-top:22px}
+.gate-code{
+  width:100%;height:56px;
+  appearance:none;border:none;border-radius:14px;background:#fff;
+  font-family:inherit;font-size:26px;font-weight:600;
+  letter-spacing:.45em;text-indent:.45em;text-align:center;
+  color:var(--label);caret-color:var(--ios-pink);
+  box-shadow:inset 0 0 0 1px rgba(60,60,67,.12);
+  outline:none;
+  transition:box-shadow .2s var(--spring-soft);
+}
+.gate-code::placeholder{color:var(--label-secondary);letter-spacing:.45em}
+.gate-code:focus{box-shadow:inset 0 0 0 1px rgba(60,60,67,.12), 0 0 0 3px rgba(255,55,95,.18)}
+.gate-error{font-size:13px;line-height:18px;color:#D70015;margin-top:10px}
+.gate-profiles{display:flex;gap:12px}
+.gate-profiles .btn{flex:1;min-width:0;padding:0 8px}
+.gate-hint{font-size:13px;line-height:18px;color:var(--label-secondary);text-align:center;margin-top:18px}
+
+/* ══ BARRA DE PESTAÑAS (iOS tab bar) ══ */
+.tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:90;
+  display:flex;
+  background:rgba(249,249,249,.94);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-top:.5px solid var(--separator);
+  padding-bottom:var(--safe-bottom);
+  height:calc(50px + var(--safe-bottom));
+}
+.tab{
+  flex:1;min-width:0;min-height:50px;
+  appearance:none;background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  color:var(--label-secondary);
+  font-family:inherit;padding:0 1px;
+  transition:color .2s, opacity .15s;
+}
+.tab-icon{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tab-icon .pip{fill:currentColor;stroke:none}
+.tab-label{font-size:11px;line-height:13px;letter-spacing:.05px;white-space:nowrap}
+.tab.is-active{color:var(--ios-deep)}
+.tab:active{opacity:.55}
+.tab:focus-visible{outline:3px solid var(--ios-pink);outline-offset:-4px;border-radius:10px}
+@media (max-width:350px){
+  .tab-label-long{display:none}   /* pantallas chicas: "Música" */
+}
+
+/* ══ PRESENCIA ══ */
+.presence-card{
+  background:#fff;border-radius:22px;
+  padding:2px 16px 14px;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 12px 32px -12px rgba(0,0,0,.16);
+}
+.presence-row{display:flex;align-items:center;gap:10px;min-height:48px}
+.presence-row + .presence-row{border-top:.5px solid var(--separator)}
+.presence-dot{
+  width:9px;height:9px;border-radius:50%;background:#C7C7CC;flex:none;
+  transition:background .3s, box-shadow .3s;
+}
+.presence-dot.is-online{background:#34C759;box-shadow:0 0 0 3px rgba(52,199,89,.2)}
+.presence-name{font-size:17px;letter-spacing:-.2px;color:var(--label)}
+.presence-status{font-size:13px;color:var(--label-secondary);margin-left:auto}
+.presence-clock{
+  font-size:15px;color:var(--label-secondary);
+  font-variant-numeric:tabular-nums;
+  min-width:66px;text-align:right;
+}
+.presence-actions{display:flex;flex-direction:column;align-items:center;gap:0;padding-top:14px}
+.presence-switch{
+  appearance:none;border:none;background:none;cursor:pointer;
+  min-height:44px;padding:0 16px;
+  font-family:inherit;font-size:13px;color:var(--label-secondary);
+}
+.presence-switch:active{opacity:.55}
+.presence-switch:focus-visible{outline:3px solid var(--ios-pink);outline-offset:2px;border-radius:8px}
+
+/* ══ ESTADOS VACÍOS (pestañas futuras) ══ */
+.soon{
+  background:#fff;border-radius:22px;
+  padding:40px 24px 36px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 12px 32px -12px rgba(0,0,0,.16);
+}
+.soon-icon{width:48px;height:48px;color:var(--ios-deep);margin-bottom:16px}
+.soon-title{font-size:22px;font-weight:700;letter-spacing:.2px;color:var(--label);margin-bottom:6px}
+.soon-body{font-size:15px;line-height:21px;color:var(--label-secondary);max-width:30ch;margin-bottom:18px}
+.soon-pill{
+  background:var(--ios-pearl);color:var(--ios-deep);
+  font-size:12px;font-weight:600;letter-spacing:.3px;
+  padding:7px 14px;border-radius:999px;
+}
+
+/* ══ FLOR · "está pensando en ti" (el momento) ══ */
+.bloom{
+  position:fixed;inset:0;z-index:130;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,245,248,.72);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  opacity:0;transition:opacity .45s var(--ios-ease);
+  pointer-events:none;padding:24px;
+}
+.bloom[hidden]{display:none}
+.bloom.is-in{opacity:1}
+.bloom-card{
+  display:flex;flex-direction:column;align-items:center;gap:20px;
+  transform:scale(.55) translateY(24px);opacity:0;
+  transition:transform .7s var(--spring), opacity .5s var(--ios-ease);
+}
+.bloom.is-in .bloom-card{transform:none;opacity:1}
+.bloom-flower{width:136px;height:136px;animation:bloomSway 3.4s ease-in-out .7s infinite}
+@keyframes bloomSway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.bloom-text{
+  font-size:20px;font-weight:600;letter-spacing:.1px;
+  color:var(--ios-deep);text-align:center;
+  background:rgba(255,255,255,.94);
+  padding:12px 22px;border-radius:999px;
+  box-shadow:0 12px 32px -10px rgba(142,65,98,.4);
+}

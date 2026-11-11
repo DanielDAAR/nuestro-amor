@@ -21,9 +21,12 @@
 <title>Para ti, Kitzya</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="manifest" href="manifest.json" />
+<meta name="apple-mobile-web-app-title" content="Nosotros 💕" />
 <link rel="stylesheet" href="css/base.css" />
 <link rel="stylesheet" href="css/ui.css" />
 <link rel="stylesheet" href="css/home.css" />
+<link rel="stylesheet" href="css/portal.css" />
 </head>
 <body>
 
@@ -31,12 +34,37 @@
 
 <div id="app">
 
+  <div class="tab-panel is-active" id="panel-inicio" data-tab="inicio" role="tabpanel" aria-label="Inicio">
+
   <!-- ══ HERO ══ -->
   <header class="hero">
     <div class="eyebrow">🎀 Solo para ti</div>
-    <h1>Kitzya</h1>
+    <h1 data-for-daniel="Daniel">Kitzya</h1>
     <p class="lede">Un te amo ingenioso — sin fechas, solo aquí y ahora.</p>
   </header>
+
+  <!-- ══ PRESENCIA ══ -->
+  <section aria-label="Presencia">
+    <div class="group-header">Presencia</div>
+    <div class="presence-card">
+      <div class="presence-row">
+        <span class="presence-dot is-online" aria-hidden="true"></span>
+        <span class="presence-name" id="selfName">–</span>
+        <span class="presence-status" id="selfStatus">eres tú</span>
+        <time class="presence-clock" id="clockSelf">–</time>
+      </div>
+      <div class="presence-row">
+        <span class="presence-dot" id="otherDot" aria-hidden="true"></span>
+        <span class="presence-name" id="otherName">–</span>
+        <span class="presence-status" id="otherStatus">–</span>
+        <time class="presence-clock" id="clockOther">–</time>
+      </div>
+      <div class="presence-actions">
+        <button class="btn btn-full" id="btnThink" type="button">Pensando en ti 🌸</button>
+        <button class="presence-switch" id="btnSwitch" type="button">Cambiar de perfil</button>
+      </div>
+    </div>
+  </section>
 
   <!-- ══ CAJA DE MÚSICA ══ -->
   <section aria-label="Caja de música">
@@ -93,8 +121,8 @@
               </div>
               <div class="flip-face flip-back">
                 <div class="flip-emoji" id="flipEmoji">🎀</div>
-                <div class="flip-title" id="flipTitle">—</div>
-                <div class="flip-desc" id="flipDesc">—</div>
+                <div class="flip-title" id="flipTitle">–</div>
+                <div class="flip-desc" id="flipDesc">–</div>
               </div>
             </div>
           </div>
@@ -137,7 +165,7 @@
     <div class="reply-card">
       <div class="reply-last" id="replyLast" hidden>
         <div class="reply-last-label">La última vez me escribiste</div>
-        <div class="reply-last-text" id="replyLastText">—</div>
+        <div class="reply-last-text" id="replyLastText">–</div>
         <button class="btn-small" id="replyClear" aria-label="Borrar lo escrito">✕</button>
       </div>
       <label class="reply-label" for="replyInput">¿Qué me dirías ahora mismo?</label>
@@ -150,9 +178,72 @@
     </div>
   </section>
 
-</div>
+  </div><!-- /panel-inicio -->
 
-<footer>Hecho con 💕 · solo para ti, Kitzya</footer>
+  <!-- ══ PESTAÑAS · ESTADOS VACÍOS ══ -->
+  <div class="tab-panel" id="panel-juegos" data-tab="juegos" role="tabpanel" aria-label="Juegos" hidden>
+    <div class="soon">
+      <svg class="soon-icon" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="4.5" y="4.5" width="17" height="17" rx="4.5"/>
+        <circle class="pip" cx="9.5" cy="9.5" r="1.1"/>
+        <circle class="pip" cx="13" cy="13" r="1.1"/>
+        <circle class="pip" cx="16.5" cy="16.5" r="1.1"/>
+      </svg>
+      <h2 class="soon-title">Juegos</h2>
+      <p class="soon-body">Tres en raya, cuatro en línea, memoria y ahorcado: aquí vivirán nuestros partidos.</p>
+      <span class="soon-pill">Muy pronto 🎀</span>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="panel-musica" data-tab="musica" role="tabpanel" aria-label="Música y cine" hidden>
+    <div class="soon">
+      <svg class="soon-icon" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <ellipse class="pip" cx="7.8" cy="18.2" rx="2.5" ry="2"/>
+        <ellipse class="pip" cx="17.8" cy="16.2" rx="2.5" ry="2"/>
+        <path d="M10.3 18.2V6"/>
+        <path d="M20.3 16.2V4"/>
+        <path d="m10.3 6 10-2"/>
+        <path d="m10.3 9 10-2"/>
+      </svg>
+      <h2 class="soon-title">Música y cine</h2>
+      <p class="soon-body">Nuestra playlist a dos, la canción del día y ver algo a la vez, aunque estemos lejos.</p>
+      <span class="soon-pill">Muy pronto 🎀</span>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="panel-cartas" data-tab="cartas" role="tabpanel" aria-label="Cartas" hidden>
+    <div class="soon">
+      <svg class="soon-icon" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3.5" y="6" width="19" height="14" rx="2.5"/>
+        <path d="m4.8 8.2 8.2 6 8.2-6"/>
+      </svg>
+      <h2 class="soon-title">Cartas</h2>
+      <p class="soon-body">Cartas para abrir en su fecha, la cápsula del tiempo y todo lo que queramos guardar.</p>
+      <span class="soon-pill">Muy pronto 🎀</span>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="panel-jardin" data-tab="jardin" role="tabpanel" aria-label="Jardín" hidden>
+    <div class="soon">
+      <svg class="soon-icon" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="13" cy="5.8" r="2.1"/>
+        <circle cx="16.8" cy="8.6" r="2.1"/>
+        <circle cx="15.4" cy="13" r="2.1"/>
+        <circle cx="10.6" cy="13" r="2.1"/>
+        <circle cx="9.2" cy="8.6" r="2.1"/>
+        <circle cx="13" cy="9.8" r="1.8"/>
+        <path d="M13 15V22"/>
+        <path d="M13 18.5c-2.4-.2-3.9-1.5-4.3-3.7 2.3-.2 3.7 1.2 4.3 3.7Z"/>
+      </svg>
+      <h2 class="soon-title">Jardín</h2>
+      <p class="soon-body">El jardín compartido: todo lo que hagamos juntos hará crecer flores nuevas.</p>
+      <span class="soon-pill">Muy pronto 🎀</span>
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<footer data-for-daniel="Hecho con 💕 · Daniel y Kitzya">Hecho con 💕 · solo para ti, Kitzya</footer>
 
 <!-- ══ LIGHTBOX (foto a pantalla completa) ══ -->
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Nuestra foto">
@@ -163,12 +254,104 @@
 <!-- ══ SHEET iOS ══ -->
 <div class="sheet-backdrop" id="sheetBackdrop"></div><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Mensaje">
   <div class="sheet-grabber"></div>
-  <div class="sheet-title" id="sheetTitle">—</div>
-  <div class="sheet-sub" id="sheetSub">—</div>
+  <div class="sheet-title" id="sheetTitle">–</div>
+  <div class="sheet-sub" id="sheetSub">–</div>
+</div>
+
+<!-- ══ PANTALLA DE ACCESO ══ -->
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <div class="gate-inner">
+    <svg class="gate-heart" viewBox="0 0 48 44" aria-hidden="true">
+      <path d="M24 40C14 32 6 25 6 16C6 9.5 11 5 17 5C20.5 5 23 7 24 9.5C25 7 27.5 5 31 5C37 5 42 9.5 42 16C42 25 34 32 24 40Z" fill="#FF375F"/>
+      <ellipse cx="16.5" cy="13.5" rx="4.2" ry="2.8" fill="#fff" opacity=".4" transform="rotate(-28 16.5 13.5)"/>
+    </svg>
+    <h1 class="gate-title" id="gateTitle">Nosotros 💕</h1>
+    <p class="gate-sub">Portal privado — solo para dos</p>
+    <label class="gate-label" for="gateCode">Código de acceso</label>
+    <input class="gate-code" id="gateCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="······" />
+    <p class="gate-error" id="gateError" role="alert" hidden></p>
+    <p class="gate-label gate-label-profile">¿Quién eres?</p>
+    <div class="gate-profiles">
+      <button class="btn" type="button" data-profile="daniel">Daniel</button>
+      <button class="btn" type="button" data-profile="kitzya">Kitzya</button>
+    </div>
+    <p class="gate-hint">El código lo comparten solo ustedes dos.</p>
+  </div>
+</div>
+
+<!-- ══ BARRA DE PESTAÑAS ══ -->
+<nav class="tabbar" role="tablist" aria-label="Secciones del portal">
+  <button class="tab is-active" type="button" role="tab" data-tab="inicio" aria-selected="true" aria-controls="panel-inicio">
+    <svg class="tab-icon" viewBox="0 0 26 26" aria-hidden="true">
+      <path d="M4.5 12.5 13 5.5l8.5 7"/>
+      <path d="M6.8 11.2v9.6h12.4v-9.6"/>
+      <path d="M10.6 20.8v-5.2h4.8v5.2"/>
+    </svg>
+    <span class="tab-label">Inicio</span>
+  </button>
+  <button class="tab" type="button" role="tab" data-tab="juegos" aria-selected="false" aria-controls="panel-juegos">
+    <svg class="tab-icon" viewBox="0 0 26 26" aria-hidden="true">
+      <rect x="4.5" y="4.5" width="17" height="17" rx="4.5"/>
+      <circle class="pip" cx="9.5" cy="9.5" r="1.1"/>
+      <circle class="pip" cx="13" cy="13" r="1.1"/>
+      <circle class="pip" cx="16.5" cy="16.5" r="1.1"/>
+    </svg>
+    <span class="tab-label">Juegos</span>
+  </button>
+  <button class="tab" type="button" role="tab" data-tab="musica" aria-selected="false" aria-controls="panel-musica">
+    <svg class="tab-icon" viewBox="0 0 26 26" aria-hidden="true">
+      <ellipse class="pip" cx="7.8" cy="18.2" rx="2.5" ry="2"/>
+      <ellipse class="pip" cx="17.8" cy="16.2" rx="2.5" ry="2"/>
+      <path d="M10.3 18.2V6"/>
+      <path d="M20.3 16.2V4"/>
+      <path d="m10.3 6 10-2"/>
+      <path d="m10.3 9 10-2"/>
+    </svg>
+    <span class="tab-label">Música<span class="tab-label-long"> y cine</span></span>
+  </button>
+  <button class="tab" type="button" role="tab" data-tab="cartas" aria-selected="false" aria-controls="panel-cartas">
+    <svg class="tab-icon" viewBox="0 0 26 26" aria-hidden="true">
+      <rect x="3.5" y="6" width="19" height="14" rx="2.5"/>
+      <path d="m4.8 8.2 8.2 6 8.2-6"/>
+    </svg>
+    <span class="tab-label">Cartas</span>
+  </button>
+  <button class="tab" type="button" role="tab" data-tab="jardin" aria-selected="false" aria-controls="panel-jardin">
+    <svg class="tab-icon" viewBox="0 0 26 26" aria-hidden="true">
+      <circle cx="13" cy="5.8" r="2.1"/>
+      <circle cx="16.8" cy="8.6" r="2.1"/>
+      <circle cx="15.4" cy="13" r="2.1"/>
+      <circle cx="10.6" cy="13" r="2.1"/>
+      <circle cx="9.2" cy="8.6" r="2.1"/>
+      <circle cx="13" cy="9.8" r="1.8"/>
+      <path d="M13 15V22"/>
+      <path d="M13 18.5c-2.4-.2-3.9-1.5-4.3-3.7 2.3-.2 3.7 1.2 4.3 3.7Z"/>
+    </svg>
+    <span class="tab-label">Jardín</span>
+  </button>
+</nav>
+
+<!-- ══ FLOR · "PENSANDO EN TI" ══ -->
+<div class="bloom" id="bloom" role="status" aria-live="polite" hidden>
+  <div class="bloom-card">
+    <svg class="bloom-flower" viewBox="0 0 120 120" aria-hidden="true">
+      <g fill="#FF8FA8">
+        <ellipse cx="60" cy="36" rx="14" ry="20"/>
+        <ellipse cx="60" cy="36" rx="14" ry="20" transform="rotate(72 60 60)"/>
+        <ellipse cx="60" cy="36" rx="14" ry="20" transform="rotate(144 60 60)"/>
+        <ellipse cx="60" cy="36" rx="14" ry="20" transform="rotate(216 60 60)"/>
+        <ellipse cx="60" cy="36" rx="14" ry="20" transform="rotate(288 60 60)"/>
+      </g>
+      <circle cx="60" cy="60" r="14" fill="#FFE066"/>
+      <circle cx="60" cy="60" r="6.5" fill="#FFF3B0"/>
+    </svg>
+    <p class="bloom-text" id="bloomText">–</p>
+  </div>
 </div>
 
 <script defer src="js/audio.js"></script>
 <script defer src="js/ui.js"></script>
 <script defer src="js/home.js"></script>
+<script defer src="js/portal.js"></script>
 </body>
 </html>
