@@ -27,6 +27,7 @@
 <link rel="stylesheet" href="css/ui.css" />
 <link rel="stylesheet" href="css/home.css" />
 <link rel="stylesheet" href="css/portal.css" />
+<link rel="stylesheet" href="css/memories.css" />
 </head>
 <body>
 
@@ -63,6 +64,32 @@
         <button class="btn btn-full" id="btnThink" type="button">Pensando en ti 🌸</button>
         <button class="presence-switch" id="btnSwitch" type="button">Cambiar de perfil</button>
       </div>
+    </div>
+  </section>
+
+  <!-- ══ CUENTA REGRESIVA ══ -->
+  <section aria-label="Cuenta regresiva">
+    <div class="group-header">Próximo encuentro</div>
+    <div class="countdown-card" id="countdownCard">
+      <div class="countdown-main">
+        <div class="countdown-value" id="countdownValue">Sin fecha todavía</div>
+        <div class="countdown-label" id="countdownLabel">Fija el día en que nos vemos</div>
+      </div>
+      <div class="countdown-actions">
+        <button class="btn-small countdown-icon" id="countdownEdit" type="button" aria-label="Fijar la fecha">✎</button>
+        <button class="countdown-clear" id="countdownClear" type="button" hidden>Quitar fecha</button>
+      </div>
+      <form class="countdown-form" id="countdownForm" hidden>
+        <label class="field-label" for="countdownWhen">¿Cuándo nos vemos?</label>
+        <input class="input" id="countdownWhen" type="datetime-local" required />
+        <label class="field-label" for="countdownNote">Una nota (opcional)</label>
+        <input class="input" id="countdownNote" type="text" maxlength="60" placeholder="Nuestro reencuentro" />
+        <p class="form-msg" id="countdownMsg" role="alert" hidden></p>
+        <div class="form-actions">
+          <button class="btn" type="submit">Guardar</button>
+          <button class="btn-ghost" id="countdownCancel" type="button">Cancelar</button>
+        </div>
+      </form>
     </div>
   </section>
 
@@ -180,7 +207,7 @@
 
   </div><!-- /panel-inicio -->
 
-  <!-- ══ PESTAÑAS · ESTADOS VACÍOS ══ -->
+  <!-- ══ PESTAÑAS ══ -->
   <div class="tab-panel" id="panel-juegos" data-tab="juegos" role="tabpanel" aria-label="Juegos" hidden>
     <div class="soon">
       <svg class="soon-icon" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -212,15 +239,71 @@
   </div>
 
   <div class="tab-panel" id="panel-cartas" data-tab="cartas" role="tabpanel" aria-label="Cartas" hidden>
-    <div class="soon">
-      <svg class="soon-icon" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="3.5" y="6" width="19" height="14" rx="2.5"/>
-        <path d="m4.8 8.2 8.2 6 8.2-6"/>
-      </svg>
-      <h2 class="soon-title">Cartas</h2>
-      <p class="soon-body">Cartas para abrir en su fecha, la cápsula del tiempo y todo lo que queramos guardar.</p>
-      <span class="soon-pill">Muy pronto 🎀</span>
-    </div>
+    <header class="panel-head">
+      <h2 class="panel-title">Cartas</h2>
+      <p class="panel-sub">Palabras que se guardan para el día correcto.</p>
+    </header>
+    <p class="form-msg memories-msg" id="memoriesMsg" role="alert" hidden></p>
+
+    <section aria-label="Cartas">
+      <div class="group-header">Cartas</div>
+      <div class="stack" id="lettersList"></div>
+      <div class="memories-empty" id="lettersEmpty" hidden>
+        <div class="memories-empty-emoji" aria-hidden="true">💌</div>
+        <p class="memories-empty-text">Todavía no hay cartas. La primera puede ser tuya.</p>
+      </div>
+
+      <div class="ios-card composer">
+        <button class="composer-toggle" id="letterToggle" type="button" aria-expanded="false" aria-controls="letterForm">
+          <span>Escribir una carta</span>
+          <span class="composer-plus" aria-hidden="true">＋</span>
+        </button>
+        <form class="composer-form" id="letterForm" hidden>
+          <label class="field-label" for="letterTitle">Título (opcional)</label>
+          <input class="input" id="letterTitle" type="text" maxlength="80" placeholder="Para cuando lo necesites" />
+          <label class="field-label" for="letterBody">Tu carta</label>
+          <textarea class="textarea" id="letterBody" maxlength="4000" rows="6" required placeholder="Escribe sin prisa…"></textarea>
+          <label class="field-label" for="letterWhen">Abrir el (opcional)</label>
+          <input class="input" id="letterWhen" type="datetime-local" />
+          <p class="field-hint">Si no pones fecha, se puede leer ahora.</p>
+          <p class="form-msg" id="letterMsg" role="alert" hidden></p>
+          <div class="form-actions">
+            <button class="btn" id="letterSubmit" type="submit">Guardar carta</button>
+            <button class="btn-ghost" id="letterCancel" type="button">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section aria-label="Cápsula del tiempo">
+      <div class="group-header">Cápsula del tiempo</div>
+      <div class="ios-card capsule" id="capsuleCard">
+        <div class="capsule-head">
+          <div class="capsule-status" id="capsuleStatus">Sin fecha todavía</div>
+          <div class="capsule-sub" id="capsuleSub">Pongan el día en que se abre.</div>
+        </div>
+
+        <form class="capsule-form" id="capsuleForm">
+          <label class="field-label" for="capsuleWhen">Se abre el</label>
+          <input class="input" id="capsuleWhen" type="datetime-local" required />
+          <p class="form-msg" id="capsuleMsg" role="alert" hidden></p>
+          <div class="form-actions">
+            <button class="btn" id="capsuleSubmit" type="submit">Sellar la cápsula</button>
+          </div>
+        </form>
+
+        <form class="capsule-form" id="capsuleAddForm" hidden>
+          <label class="field-label" for="capsuleText">Guardar algo para ese día</label>
+          <textarea class="textarea" id="capsuleText" maxlength="1000" rows="4" required placeholder="Lo que quieras que leamos después…"></textarea>
+          <p class="form-msg" id="capsuleAddMsg" role="alert" hidden></p>
+          <div class="form-actions">
+            <button class="btn" id="capsuleAddSubmit" type="submit">Guardar en la cápsula</button>
+          </div>
+        </form>
+
+        <div class="capsule-list" id="capsuleList"></div>
+      </div>
+    </section>
   </div>
 
   <div class="tab-panel" id="panel-jardin" data-tab="jardin" role="tabpanel" aria-label="Jardín" hidden>
@@ -278,6 +361,9 @@
     <p class="gate-hint">El código lo comparten solo ustedes dos.</p>
   </div>
 </div>
+
+<!-- ══ AVISO SIN CONEXIÓN ══ -->
+<div class="offline-pill" id="offlinePill" role="status" hidden>Sin conexión · mostrando lo último</div>
 
 <!-- ══ BARRA DE PESTAÑAS ══ -->
 <nav class="tabbar" role="tablist" aria-label="Secciones del portal">
@@ -351,7 +437,9 @@
 
 <script defer src="js/audio.js"></script>
 <script defer src="js/ui.js"></script>
+<script defer src="js/api.js"></script>
 <script defer src="js/home.js"></script>
 <script defer src="js/portal.js"></script>
+<script defer src="js/memories.js"></script>
 </body>
 </html>

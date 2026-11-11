@@ -1,12 +1,13 @@
 /* ═══════════════════════════════════════════════════════════
    PORTAL · acceso, pestañas, presencia, relojes, flor, PWA
-   Carga después de ui.js y home.js (scope global compartido):
+   Carga después de api.js y home.js (scope global compartido):
    reutiliza bell/chime (audio.js) y burst (ui.js).
+   Único emisor de portal:ready, portal:tab y portal:heartbeat.
    ═══════════════════════════════════════════════════════════ */
 
-const API_URL = '/api';
 const TZ = 'America/Mexico_City';
 const SESSION_KEY = 'portal-session-v1';
+const DAY_KEY = 'portal-day-v1';       // día con presencia ya enviado (local)
 const HEARTBEAT_MS = 15000;      // latido de presencia
 const ONLINE_MS = 45000;         // sin latido 45 s → "ya no está en línea"
 const THINK_MS = 90000;          // la flor dura 90 s
@@ -24,6 +25,13 @@ function loadSession() {
 }
 function saveSession(s) { try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {} }
 function clearSession() { try { localStorage.removeItem(SESSION_KEY); } catch (e) {} }
+
+/* Si api.js no llegó a cargar, el portal sigue viéndose:
+   bus vacío en vez de pantalla en blanco. */
+if (typeof window.PortalBus !== 'object' || window.PortalBus === null) {
+  window.PortalBus = { on: function () {}, emit: function () {} };
+}
+const PortalBus = window.PortalBus;
 
 /* ── pantalla de acceso ── */
 const gate = document.getElementById('gate');
@@ -61,20 +69,20 @@ async function login(profile) {
   setGateError('');
 
   try {
-    const r = await fetch(API_URL + '?action=auth', {
+    if (typeof PortalAPI !== 'function') {
+      setGateError('No se pudo conectar. Revisa tu conexión.');
+      return;
+    }
+    const res = await PortalAPI('auth', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ code, profile }),
+      body: { code: code, profile: profile },
     });
-    if (r.status === 429) { setGateError('Demasiados intentos. Espera unos minutos.'); return; }
-    if (r.status === 401) { setGateError('Código incorrecto. Revísalo e inténtalo otra vez.'); gateCode.select(); return; }
-    if (!r.ok) { setGateError('No se pudo conectar. Revisa tu conexión.'); return; }
-    const data = await r.json();
-    if (!data.token) { setGateError('No se pudo conectar. Inténtalo otra vez.'); return; }
-    saveSession({ profile: profile, token: data.token, at: Date.now() });
+    if (res.status === 429) { setGateError('Demasiados intentos. Espera unos minutos.'); return; }
+    if (res.status === 401) { setGateError('Código incorrecto. Revísalo e inténtalo otra vez.'); gateCode.select(); return; }
+    if (res.status === 0) { setGateError('Sin conexión. Vuelve a intentarlo cuando haya red.'); return; }
+    if (!res.ok || !res.data || !res.data.token) { setGateError('No se pudo conectar. Inténtalo otra vez.'); return; }
+    saveSession({ profile: profile, token: res.data.token, at: Date.now() });
     startPortal(profile);
-  } catch (e) {
-    setGateError('Sin conexión. Vuelve a intentarlo cuando haya red.');
   } finally {
     gateBtns.forEach((b) => { b.disabled = false; });
     pressed.textContent = original;
@@ -99,6 +107,7 @@ function selectTab(id) {
     p.classList.toggle('is-active', on);
   });
   window.scrollTo(0, 0);
+  PortalBus.emit('portal:tab', { tab: id });
 }
 document.querySelectorAll('.tab').forEach((t) => {
   t.addEventListener('click', () => selectTab(t.dataset.tab));
@@ -109,6 +118,160 @@ function applyProfileCopy(profile) {
   if (profile !== 'daniel') return;
   document.querySelectorAll('[data-for-daniel]').forEach((el) => {
     el.innerHTML = el.getAttribute('data-for-daniel');
+  });
+}
+
+/* ── sesión vencida: la avisa api.js, aquí se responde ── */
+PortalBus.on('portal:auth-lost', () => {
+  if (!session) return;
+  stopHeartbeat();
+  clearSession();
+  session = null;
+  lastCountdown = null;
+  renderCountdown();
+  showGate('Tu sesión ya no es válida. Entra otra vez.');
+});
+
+/* ── cuenta regresiva ── */
+let lastCountdown = null;
+
+const countdownValueEl = document.getElementById('countdownValue');
+const countdownLabelEl = document.getElementById('countdownLabel');
+const countdownForm = document.getElementById('countdownForm');
+const countdownWhenEl = document.getElementById('countdownWhen');
+const countdownNoteEl = document.getElementById('countdownNote');
+const countdownMsgEl = document.getElementById('countdownMsg');
+const countdownEditEl = document.getElementById('countdownEdit');
+const countdownClearEl = document.getElementById('countdownClear');
+const countdownCancelEl = document.getElementById('countdownCancel');
+const offlinePillEl = document.getElementById('offlinePill');
+
+function countdownMsg(text) {
+  if (!countdownMsgEl) return;
+  countdownMsgEl.textContent = text || '';
+  countdownMsgEl.hidden = !text;
+}
+
+/* Día del portal: la fecha local, no la del servidor. */
+function todayKey() {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit',
+  }).formatToParts(new Date());
+  const o = {};
+  parts.forEach((p) => { o[p.type] = p.value; });
+  return o.year + '-' + o.month + '-' + o.day;
+}
+
+/* La tarjeta se repinta sola: cae la fecha, la cuenta avanza. */
+function renderCountdown() {
+  if (!countdownValueEl) return;
+  const cd = lastCountdown;
+
+  if (!cd || !cd.when) {
+    countdownValueEl.textContent = 'Sin fecha todavía';
+    countdownLabelEl.textContent = 'Fija el día en que nos vemos';
+    if (countdownClearEl) countdownClearEl.hidden = true;
+    if (countdownEditEl) countdownEditEl.setAttribute('aria-label', 'Fijar la fecha');
+    return;
+  }
+
+  const remaining = cd.when - Date.now();
+  if (remaining <= 0) {
+    countdownValueEl.textContent = 'Ya pasó';
+    countdownLabelEl.textContent = cd.label || 'Fija otra fecha cuando quieras';
+  } else {
+    const days = Math.floor(remaining / 86400000);
+    const hours = Math.floor(remaining / 3600000) % 24;
+    const mins = Math.floor(remaining / 60000) % 60;
+    if (days > 0) {
+      const tail = [];
+      if (hours) tail.push(hours + ' h');
+      if (mins) tail.push(mins + ' min');
+      const detail = tail.length ? tail.join(' ') : 'en punto';
+      countdownValueEl.textContent = days + (days === 1 ? ' día' : ' días');
+      countdownLabelEl.textContent = cd.label ? detail + ' · ' + cd.label : detail;
+    } else if (hours > 0) {
+      countdownValueEl.textContent = hours + ' h ' + mins + ' min';
+      countdownLabelEl.textContent = cd.label || 'Es hoy';
+    } else if (mins > 0) {
+      countdownValueEl.textContent = mins + ' min';
+      countdownLabelEl.textContent = cd.label || 'Es hoy';
+    } else {
+      countdownValueEl.textContent = 'menos de un minuto';
+      countdownLabelEl.textContent = cd.label || 'Es hoy';
+    }
+  }
+
+  if (countdownClearEl) countdownClearEl.hidden = false;
+  if (countdownEditEl) countdownEditEl.setAttribute('aria-label', 'Cambiar la fecha');
+}
+
+function showCountdownForm() {
+  if (!countdownForm) return;
+  countdownForm.hidden = false;
+  if (countdownEditEl) countdownEditEl.hidden = true;
+  if (countdownWhenEl) {
+    countdownWhenEl.min = PortalTime.toInput(Date.now() + 60000);
+    countdownWhenEl.value = lastCountdown && lastCountdown.when
+      ? PortalTime.toInput(lastCountdown.when)
+      : '';
+  }
+  if (countdownNoteEl) {
+    countdownNoteEl.value = lastCountdown && lastCountdown.label ? lastCountdown.label : '';
+  }
+  countdownMsg('');
+  if (countdownWhenEl) countdownWhenEl.focus();
+}
+
+function hideCountdownForm() {
+  if (!countdownForm) return;
+  countdownForm.hidden = true;
+  if (countdownEditEl) countdownEditEl.hidden = false;
+  countdownMsg('');
+}
+
+if (countdownEditEl) {
+  countdownEditEl.addEventListener('click', showCountdownForm);
+}
+if (countdownCancelEl) {
+  countdownCancelEl.addEventListener('click', hideCountdownForm);
+}
+
+if (countdownForm) {
+  countdownForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const when = toEpoch(countdownWhenEl ? countdownWhenEl.value : '');
+    if (when === null) { countdownMsg('Elige una fecha y hora.'); return; }
+    const label = countdownNoteEl ? countdownNoteEl.value.trim().slice(0, 60) : '';
+    const btn = countdownForm.querySelector('button[type="submit"]');
+    const btnLabel = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
+    countdownMsg('');
+
+    const res = await PortalAPI('countdown', { method: 'POST', body: { when: when, label: label } });
+
+    if (btn) { btn.disabled = false; btn.textContent = btnLabel; }
+    if (!res.ok) {
+      countdownMsg(res.status === 0 ? 'Sin conexión. Inténtalo cuando vuelvas a tener red.' : 'No se pudo guardar. Inténtalo otra vez.');
+      return;
+    }
+    lastCountdown = res.data;
+    renderCountdown();
+    hideCountdownForm();
+  });
+}
+
+if (countdownClearEl) {
+  countdownClearEl.addEventListener('click', async () => {
+    if (!lastCountdown || !lastCountdown.when) return;
+    if (!confirm('¿Quitar la fecha del próximo encuentro?')) return;
+    const res = await PortalAPI('countdown', { method: 'POST', body: { clear: true } });
+    if (!res.ok) {
+      countdownMsg(res.status === 0 ? 'Sin conexión. Inténtalo cuando vuelvas a tener red.' : 'No se pudo quitar. Inténtalo otra vez.');
+      return;
+    }
+    lastCountdown = res.data;
+    renderCountdown();
   });
 }
 
@@ -137,6 +300,7 @@ function tickClocks() {
   const t = clockFmt.format(new Date());
   if (clockSelfEl) clockSelfEl.textContent = t;
   if (clockOtherEl) clockOtherEl.textContent = t;
+  renderCountdown();
 }
 
 function agoText(ts) {
@@ -151,10 +315,15 @@ function agoText(ts) {
 }
 
 function setOffline() {
-  if (isOffline) return;
   isOffline = true;
   if (otherStatusEl) otherStatusEl.textContent = 'sin conexión';
   if (otherDotEl) otherDotEl.classList.remove('is-online');
+  if (offlinePillEl) offlinePillEl.hidden = false;
+}
+
+function clearOffline() {
+  isOffline = false;
+  if (offlinePillEl) offlinePillEl.hidden = true;
 }
 
 function renderPresence(state) {
@@ -180,32 +349,35 @@ function renderPresence(state) {
 
 async function sync(thinking) {
   if (!session) return false;
+  if (typeof PortalAPI !== 'function') { setOffline(); return false; }
+
+  const body = {};
+  if (thinking) body.thinking = true;
+
+  /* la marca del día se envía una sola vez al día local */
+  let sentDay = null;
+  const day = todayKey();
   try {
-    const r = await fetch(API_URL + '?action=presence', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-portal-profile': session.profile,
-        'x-portal-token': session.token,
-      },
-      body: JSON.stringify(thinking ? { thinking: true } : {}),
-    });
-    if (r.status === 401) {
-      stopHeartbeat();
-      clearSession();
-      session = null;
-      showGate('Tu sesión ya no es válida. Entra otra vez.');
-      return false;
-    }
-    if (!r.ok) throw new Error('http');
-    const state = await r.json();
-    isOffline = false;
-    renderPresence(state);
-    return true;
-  } catch (e) {
-    setOffline();
+    if (localStorage.getItem(DAY_KEY) !== day) { body.day = day; sentDay = day; }
+  } catch (e) {}
+
+  const res = await PortalAPI('presence', { method: 'POST', body: body });
+
+  if (!res.ok) {
+    if (res.status !== 401) setOffline();
     return false;
   }
+  clearOffline();
+  if (sentDay) {
+    try { localStorage.setItem(DAY_KEY, sentDay); } catch (e) {}
+  }
+
+  const state = res.data;
+  renderPresence(state);
+  lastCountdown = state && state.countdown ? state.countdown : null;
+  renderCountdown();
+  PortalBus.emit('portal:heartbeat', { state: state });
+  return true;
 }
 
 function startHeartbeat() {
@@ -286,6 +458,9 @@ function startPortal(profile) {
   session = loadSession();
   if (typeof renderReply === 'function') renderReply();  // re-aplica la clave por perfil
   startHeartbeat();
+
+  /* los módulos (memories.js…) arrancan aquí: cubre sesión guardada y login */
+  PortalBus.emit('portal:ready', { profile: profile });
 }
 
 if (session) {
@@ -296,6 +471,7 @@ if (session) {
 
 tickClocks();
 setInterval(tickClocks, 10000);
+renderCountdown();
 
 /* ── PWA: registrar el service worker ── */
 if ('serviceWorker' in navigator) {

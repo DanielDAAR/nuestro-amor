@@ -107,6 +107,107 @@ body.gate-open{overflow:hidden}
 .presence-switch:active{opacity:.55}
 .presence-switch:focus-visible{outline:3px solid var(--ios-pink);outline-offset:2px;border-radius:8px}
 
+/* ══ TÍTULO DE PESTAÑA (módulos) ══ */
+.panel-head{padding:18px 4px 22px}
+.panel-title{
+  font-family:'Savoye LET','Snell Roundhand','Apple Chancery',cursive;
+  font-size:38px;line-height:1.1;font-weight:400;letter-spacing:.4px;
+  color:var(--ios-deep);
+}
+.panel-sub{font-size:15px;line-height:21px;color:var(--label-secondary);margin-top:2px}
+
+/* ══ FORMULARIOS (primitivas compartidas) ══ */
+.field-label{
+  display:block;
+  font-size:13px;line-height:18px;font-weight:600;
+  color:var(--label-secondary);
+  margin:10px 0 0;
+}
+.field-label:first-child{margin-top:0}
+.input,.textarea{
+  width:100%;
+  appearance:none;-webkit-appearance:none;
+  border:none;border-radius:12px;
+  background:var(--fill-tertiary);
+  font-family:inherit;font-size:16px;line-height:22px;color:var(--label);
+  padding:12px 14px;min-height:48px;
+  box-shadow:inset 0 0 0 .5px rgba(60,60,67,.12);
+  outline:none;
+  transition:box-shadow .2s var(--spring-soft);
+}
+.textarea{min-height:120px;resize:vertical}
+.input:focus,.textarea:focus{
+  box-shadow:inset 0 0 0 .5px rgba(60,60,67,.12), 0 0 0 3px rgba(255,55,95,.18);
+}
+.field-hint{font-size:12px;line-height:17px;color:var(--label-secondary);margin-top:2px}
+.form-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+.form-actions .btn{flex:1;min-width:140px;padding:0 18px;min-height:48px}
+.form-msg{font-size:13px;line-height:18px;color:#D70015;margin-top:2px}
+.form-msg[hidden]{display:none}
+.btn-ghost{
+  appearance:none;background:none;border:none;cursor:pointer;
+  min-height:48px;padding:0 14px;border-radius:12px;
+  font-family:inherit;font-size:16px;font-weight:600;
+  color:var(--ios-deep);
+}
+.btn-ghost:active{opacity:.55}
+.btn-ghost:focus-visible{outline:3px solid var(--ios-pink);outline-offset:2px}
+.link-btn{
+  appearance:none;background:none;border:none;cursor:pointer;
+  min-height:44px;padding:0 8px;border-radius:10px;
+  font-family:inherit;font-size:14px;font-weight:600;
+  color:var(--ios-deep);
+}
+.link-btn.danger{color:#C2185B}
+.link-btn:active{opacity:.55}
+.link-btn:focus-visible{outline:3px solid var(--ios-pink);outline-offset:2px}
+
+/* ══ CUENTA REGRESIVA ══ */
+.countdown-card{
+  background:#fff;border-radius:22px;
+  padding:16px;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 12px 32px -12px rgba(0,0,0,.16);
+  display:flex;flex-direction:column;gap:14px;
+}
+.countdown-main{display:flex;flex-direction:column;gap:2px}
+.countdown-value{
+  font-size:34px;line-height:1.15;font-weight:700;letter-spacing:-.5px;
+  color:var(--ios-deep);
+  font-variant-numeric:tabular-nums;
+}
+.countdown-label{font-size:14px;line-height:20px;color:var(--label-secondary)}
+.countdown-actions{display:flex;align-items:center;gap:10px;min-height:44px}
+.countdown-icon{background:var(--ios-pearl);color:var(--ios-deep)}
+.countdown-clear{
+  appearance:none;background:none;border:none;cursor:pointer;
+  min-height:44px;padding:0 10px;border-radius:10px;
+  font-family:inherit;font-size:14px;font-weight:600;color:#C2185B;
+}
+.countdown-clear:active{opacity:.55}
+.countdown-clear:focus-visible{outline:3px solid var(--ios-pink);outline-offset:2px}
+.countdown-form{
+  display:flex;flex-direction:column;gap:8px;
+  border-top:.5px solid var(--separator);
+  padding-top:14px;
+}
+.countdown-form .field-label{margin-top:0}
+.countdown-form[hidden]{display:none}
+
+/* ══ AVISO SIN CONEXIÓN ══ */
+.offline-pill{
+  position:fixed;left:50%;bottom:calc(var(--safe-bottom) + 62px);
+  transform:translateX(-50%);
+  z-index:95;
+  max-width:calc(100% - 32px);
+  background:rgba(60,60,67,.92);color:#fff;
+  font-size:13px;line-height:18px;font-weight:500;
+  padding:8px 14px;border-radius:999px;
+  text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+  pointer-events:none;
+}
+.offline-pill[hidden]{display:none}
+
 /* ══ ESTADOS VACÍOS (pestañas futuras) ══ */
 .soon{
   background:#fff;border-radius:22px;

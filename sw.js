@@ -3,7 +3,7 @@
    Network-first con respaldo en caché:
    online = siempre fresco · offline = lo último guardado
    ══════════════════════════════════════ */
-const CACHE = 'nosotros-v1';
+const CACHE = 'nosotros-v2';
 
 const ASSETS = [
   './',
@@ -12,10 +12,13 @@ const ASSETS = [
   './css/ui.css',
   './css/home.css',
   './css/portal.css',
+  './css/memories.css',
   './js/audio.js',
   './js/ui.js',
+  './js/api.js',
   './js/home.js',
   './js/portal.js',
+  './js/memories.js',
   './manifest.json',
   './foto-nuestra.jpg',
   './favicon.svg',
