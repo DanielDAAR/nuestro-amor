@@ -3,7 +3,7 @@
    Network-first con respaldo en caché:
    online = siempre fresco · offline = lo último guardado
    ══════════════════════════════════════ */
-const CACHE = 'nosotros-v2';
+const CACHE = 'nosotros-v3';
 
 const ASSETS = [
   './',
@@ -13,12 +13,20 @@ const ASSETS = [
   './css/home.css',
   './css/portal.css',
   './css/memories.css',
+  './css/music.css',
+  './css/games.css',
+  './css/cinema.css',
+  './css/garden.css',
   './js/audio.js',
   './js/ui.js',
   './js/api.js',
   './js/home.js',
   './js/portal.js',
   './js/memories.js',
+  './js/music.js',
+  './js/cinema.js',
+  './js/games.js',
+  './js/garden.js',
   './manifest.json',
   './foto-nuestra.jpg',
   './favicon.svg',
@@ -48,7 +56,27 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;                    // nada de API
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;     // solo mismo origen
-  if (url.pathname.startsWith('/api')) return;         // presencia siempre a red
+
+  /* Las fotos del álbum son la única excepción: se sirven desde caché
+     si ya se bajaron (action=photo es un GET autenticado, no se comparte). */
+  const isPhoto = url.pathname.startsWith('/api') && url.searchParams.get('action') === 'photo';
+  if (url.pathname.startsWith('/api') && !isPhoto) return;   // el resto de la API, siempre a red
+
+  if (isPhoto) {
+    e.respondWith(
+      caches.match(req).then((hit) => {
+        if (hit) return hit;
+        return fetch(req).then((res) => {
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy));
+          }
+          return res;
+        }).catch(() => Response.error());
+      })
+    );
+    return;
+  }
 
   const isNav = req.mode === 'navigate';
 

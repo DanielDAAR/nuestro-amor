@@ -28,6 +28,10 @@
 <link rel="stylesheet" href="css/home.css" />
 <link rel="stylesheet" href="css/portal.css" />
 <link rel="stylesheet" href="css/memories.css" />
+<link rel="stylesheet" href="css/music.css" />
+<link rel="stylesheet" href="css/games.css" />
+<link rel="stylesheet" href="css/cinema.css" />
+<link rel="stylesheet" href="css/garden.css" />
 </head>
 <body>
 
@@ -209,33 +213,104 @@
 
   <!-- ══ PESTAÑAS ══ -->
   <div class="tab-panel" id="panel-juegos" data-tab="juegos" role="tabpanel" aria-label="Juegos" hidden>
-    <div class="soon">
-      <svg class="soon-icon" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="4.5" y="4.5" width="17" height="17" rx="4.5"/>
-        <circle class="pip" cx="9.5" cy="9.5" r="1.1"/>
-        <circle class="pip" cx="13" cy="13" r="1.1"/>
-        <circle class="pip" cx="16.5" cy="16.5" r="1.1"/>
-      </svg>
-      <h2 class="soon-title">Juegos</h2>
-      <p class="soon-body">Tres en raya, cuatro en línea, memoria y ahorcado: aquí vivirán nuestros partidos.</p>
-      <span class="soon-pill">Muy pronto 🎀</span>
-    </div>
+    <header class="panel-head">
+      <h2 class="panel-title">Juegos</h2>
+      <p class="panel-sub">Partidas por turnos, para jugar desde los dos teléfonos.</p>
+    </header>
+    <p class="form-msg memories-msg" id="gamesMsg" role="alert" hidden></p>
+
+    <section aria-label="Juegos">
+      <div class="group-header">Partidas</div>
+      <div class="game-picker" id="gamePicker" role="group" aria-label="Elegir juego">
+        <button class="game-pick" type="button" data-game="ttt">Tres en raya</button>
+        <button class="game-pick" type="button" data-game="four">4 en línea</button>
+        <button class="game-pick" type="button" data-game="memory">Memoria</button>
+        <button class="game-pick" type="button" data-game="hangman">Ahorcado</button>
+      </div>
+      <div class="ios-card game-card">
+        <p class="game-status" id="gameStatus" role="status" aria-live="polite">Elige un juego para empezar la partida.</p>
+        <div class="game-board" id="gameBoard"></div>
+        <div class="hangman-word" id="hangmanWord" hidden></div>
+        <div class="hangman-keyboard" id="hangmanKeyboard" hidden></div>
+        <div class="form-actions">
+          <button class="btn-ghost" id="btnNewGame" type="button">Empezar partida</button>
+          <button class="link-btn danger" id="btnDeleteGame" type="button" hidden>Borrar partida</button>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Quizzes">
+      <div class="group-header">¿Cuánto me conoces?</div>
+      <div class="ios-card quiz-card">
+        <div class="quiz-tabs" id="quizTabs" role="group" aria-label="Elegir quiz">
+          <button class="quiz-tab is-active" type="button" data-quiz="conoces">Cuánto me conoces</button>
+          <button class="quiz-tab" type="button" data-quiz="estooaquello">Esto o aquello</button>
+        </div>
+        <div class="quiz-question" id="quizQuestion"></div>
+        <div class="quiz-options" id="quizOptions"></div>
+        <p class="quiz-result" id="quizResult" role="status" aria-live="polite"></p>
+      </div>
+    </section>
   </div>
 
   <div class="tab-panel" id="panel-musica" data-tab="musica" role="tabpanel" aria-label="Música y cine" hidden>
-    <div class="soon">
-      <svg class="soon-icon" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <ellipse class="pip" cx="7.8" cy="18.2" rx="2.5" ry="2"/>
-        <ellipse class="pip" cx="17.8" cy="16.2" rx="2.5" ry="2"/>
-        <path d="M10.3 18.2V6"/>
-        <path d="M20.3 16.2V4"/>
-        <path d="m10.3 6 10-2"/>
-        <path d="m10.3 9 10-2"/>
-      </svg>
-      <h2 class="soon-title">Música y cine</h2>
-      <p class="soon-body">Nuestra playlist a dos, la canción del día y ver algo a la vez, aunque estemos lejos.</p>
-      <span class="soon-pill">Muy pronto 🎀</span>
-    </div>
+    <header class="panel-head">
+      <h2 class="panel-title">Música y cine</h2>
+      <p class="panel-sub">Nuestra canción y lo que queremos ver juntos.</p>
+    </header>
+    <p class="form-msg memories-msg" id="musicMsg" role="alert" hidden></p>
+
+    <section aria-label="Canción del día">
+      <div class="group-header">Canción del día</div>
+      <div class="ios-card now-card" id="nowCard">
+        <p class="now-empty" id="nowEmpty">Todavía no hay canción. Pon un link abajo.</p>
+        <div class="now-body" id="nowBody" hidden>
+          <img class="now-art" id="nowArt" alt="" loading="lazy" decoding="async" />
+          <div class="now-info">
+            <div class="now-title" id="nowTitle">–</div>
+            <div class="now-artist" id="nowArtist">–</div>
+            <div class="now-by" id="nowBy">–</div>
+          </div>
+        </div>
+        <div class="sync-card" id="syncCard">
+          <button class="btn" id="btnSync" type="button">Escuchar juntos 🎧</button>
+          <p class="sync-count" id="syncCountdown" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Nuestra playlist">
+      <div class="group-header">Nuestra playlist</div>
+      <form class="ios-card song-form" id="songForm">
+        <label class="field-label" for="songUrl">Link de YouTube o Spotify</label>
+        <input class="input" id="songUrl" type="url" inputmode="url" placeholder="https://…" required />
+        <label class="field-label" for="songNote">Dedicatoria (opcional)</label>
+        <input class="input" id="songNote" type="text" maxlength="140" placeholder="Para ti" />
+        <p class="form-msg" id="songFormMsg" role="alert" hidden></p>
+        <div class="form-actions">
+          <button class="btn" id="songSubmit" type="submit">Dedicar canción</button>
+        </div>
+      </form>
+      <div class="stack" id="songsList"></div>
+    </section>
+
+    <section aria-label="Cine">
+      <div class="group-header">Para ver juntos</div>
+      <form class="ios-card watch-form" id="watchForm">
+        <label class="field-label" for="watchTitle">Título</label>
+        <input class="input" id="watchTitle" type="text" maxlength="120" placeholder="Una película o una serie" required />
+        <p class="form-msg" id="watchMsg" role="alert" hidden></p>
+        <div class="form-actions">
+          <button class="btn" id="watchSubmit" type="submit">Añadir a la lista</button>
+        </div>
+      </form>
+      <div class="stack" id="watchList"></div>
+      <div class="ios-card roulette-card">
+        <div class="group-header">Ruleta</div>
+        <button class="btn" id="btnRoulette" type="button">Sortear 🎲</button>
+        <p class="roulette-result" id="rouletteResult" role="status" aria-live="polite"></p>
+      </div>
+    </section>
   </div>
 
   <div class="tab-panel" id="panel-cartas" data-tab="cartas" role="tabpanel" aria-label="Cartas" hidden>
@@ -304,24 +379,81 @@
         <div class="capsule-list" id="capsuleList"></div>
       </div>
     </section>
+
+    <section aria-label="Álbum">
+      <div class="group-header">Álbum</div>
+      <form class="ios-card album-form" id="albumForm">
+        <label class="field-label" for="photoPhrase">Frase</label>
+        <input class="input" id="photoPhrase" type="text" maxlength="140" placeholder="Lo que quieras recordar" />
+        <label class="field-label" for="photoDate">Fecha</label>
+        <input class="input" id="photoDate" type="date" />
+        <label class="field-label" for="photoInput">Foto</label>
+        <input class="photo-input" id="photoInput" type="file" accept="image/jpeg,image/png" capture="environment" />
+        <p class="field-hint">Se comprime en tu teléfono antes de salir (máx. 1,5 MB).</p>
+        <p class="form-msg" id="albumMsg" role="alert" hidden></p>
+        <div class="form-actions">
+          <button class="btn" id="albumSubmit" type="submit">Guardar en el álbum</button>
+        </div>
+      </form>
+      <div class="photo-grid" id="photoGrid"></div>
+    </section>
+
+    <section aria-label="Diario">
+      <div class="group-header">Diario a dos voces</div>
+      <div class="ios-card diary-card" id="diaryCard">
+        <p class="diary-hint" id="diaryHint">Cada uno escribe su parte. La del otro se ve cuando las dos están escritas.</p>
+        <div class="stack" id="diaryList"></div>
+        <form class="diary-form" id="diaryForm" hidden>
+          <label class="field-label" for="diaryText">Tu parte de hoy</label>
+          <textarea class="textarea" id="diaryText" maxlength="1000" rows="4" placeholder="Escríbelo aquí…"></textarea>
+          <p class="form-msg" id="diaryMsg" role="alert" hidden></p>
+          <div class="form-actions">
+            <button class="btn" id="diarySubmit" type="submit">Guardar mi parte</button>
+            <button class="btn-ghost" id="diaryCancel" type="button">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </section>
   </div>
 
   <div class="tab-panel" id="panel-jardin" data-tab="jardin" role="tabpanel" aria-label="Jardín" hidden>
-    <div class="soon">
-      <svg class="soon-icon" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="13" cy="5.8" r="2.1"/>
-        <circle cx="16.8" cy="8.6" r="2.1"/>
-        <circle cx="15.4" cy="13" r="2.1"/>
-        <circle cx="10.6" cy="13" r="2.1"/>
-        <circle cx="9.2" cy="8.6" r="2.1"/>
-        <circle cx="13" cy="9.8" r="1.8"/>
-        <path d="M13 15V22"/>
-        <path d="M13 18.5c-2.4-.2-3.9-1.5-4.3-3.7 2.3-.2 3.7 1.2 4.3 3.7Z"/>
-      </svg>
-      <h2 class="soon-title">Jardín</h2>
-      <p class="soon-body">El jardín compartido: todo lo que hagamos juntos hará crecer flores nuevas.</p>
-      <span class="soon-pill">Muy pronto 🎀</span>
-    </div>
+    <header class="panel-head">
+      <h2 class="panel-title">Jardín</h2>
+      <p class="panel-sub">Cada cosa que hagamos juntos hace crecer una flor.</p>
+    </header>
+
+    <section aria-label="Nuestro jardín">
+      <div class="group-header">Nuestro jardín</div>
+      <div class="garden garden-shared" id="gardenShared">
+        <div class="garden-ground"></div>
+      </div>
+      <p class="garden-count" id="gardenCount">–</p>
+      <div class="stack" id="achievementsList"></div>
+    </section>
+
+    <section aria-label="Reto de la semana">
+      <div class="group-header">Reto de la semana</div>
+      <div class="ios-card challenge-card" id="challengeCard">
+        <p class="challenge-prompt" id="challengePrompt">Todavía no hay reto esta semana.</p>
+        <form class="challenge-form" id="challengePromptForm">
+          <label class="field-label" for="challengePromptInput">Proponer el reto</label>
+          <input class="input" id="challengePromptInput" type="text" maxlength="200" placeholder="Algo para hacer juntos" />
+          <div class="form-actions">
+            <button class="btn" id="challengePromptSubmit" type="submit">Proponer</button>
+          </div>
+        </form>
+        <div class="challenge-answer">
+          <label class="field-label" for="challengePhoto">Tu foto</label>
+          <input class="photo-input" id="challengePhoto" type="file" accept="image/jpeg,image/png" capture="environment" />
+          <label class="field-label" for="challengeNote">Nota</label>
+          <input class="input" id="challengeNote" type="text" maxlength="140" placeholder="Cómo nos fue" />
+          <p class="form-msg" id="challengeMsg" role="alert" hidden></p>
+          <div class="form-actions">
+            <button class="btn" id="challengeAnswerSubmit" type="button">Enviar mi respuesta</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
 </div><!-- /#app -->
@@ -360,6 +492,16 @@
     </div>
     <p class="gate-hint">El código lo comparten solo ustedes dos.</p>
   </div>
+</div>
+
+<!-- ══ GLOBO · canción actual (lo pinta js/music.js) ══ -->
+<div class="song-bubble" id="songBubble" role="region" aria-label="Canción actual" hidden>
+  <img class="song-bubble-art" id="bubbleArt" alt="" loading="lazy" decoding="async" />
+  <div class="song-bubble-info">
+    <div class="song-bubble-title" id="bubbleTitle">–</div>
+    <div class="song-bubble-by" id="bubbleBy">–</div>
+  </div>
+  <button class="song-bubble-close" id="bubbleClose" type="button" aria-label="Cerrar el globo">✕</button>
 </div>
 
 <!-- ══ AVISO SIN CONEXIÓN ══ -->
@@ -441,5 +583,9 @@
 <script defer src="js/home.js"></script>
 <script defer src="js/portal.js"></script>
 <script defer src="js/memories.js"></script>
+<script defer src="js/music.js"></script>
+<script defer src="js/cinema.js"></script>
+<script defer src="js/games.js"></script>
+<script defer src="js/garden.js"></script>
 </body>
 </html>
