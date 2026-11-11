@@ -50,6 +50,19 @@
 
 /* espacio entre secciones dentro de Música y cine */
 .watch-form,.watch-item,.song-form,.song-item{
+  margin-bottom:14px;
+}
+.watch-form{
+  padding:16px 16px 18px;
+}
+.watch-form .field-label{margin-top:0}
+.watch-form .form-actions{
+  margin-top:10px;
+}
+.watch-form .btn{
+  width:100%;min-height:48px;
+}
+.watch-item{
   margin-bottom:12px;
 }
 
