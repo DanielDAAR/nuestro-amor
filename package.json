@@ -1,0 +1,9 @@
+{
+  "name": "nuestro-amor-portal",
+  "private": true,
+  "description": "Solo para la function /api (Netlify Functions + Blobs). El front es 100% plano: sin build, sin framework, se abre con doble clic.",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@netlify/blobs": "^11.1.9"
+  }
+}
