@@ -87,6 +87,7 @@
 
   function watchItem(item) {
     const card = el('article', 'watch-item ios-card');
+    if (item.id) card.setAttribute('data-watch-id', item.id);
     const head = el('div', 'watch-head');
     head.appendChild(el('span', 'watch-title', item.title));
     const by = el('span', 'watch-by', 'Añadido por ' + (NAMES[item.by] || item.by));
@@ -128,7 +129,8 @@
 
   async function submitRating(id, rating) {
     if (rating < 1 || rating > 5) return;
-    const btns = document.querySelectorAll('[data-rating]');
+    const card = document.querySelector('.watch-item[data-watch-id="' + id + '"]');
+    const btns = card ? card.querySelectorAll('[data-rating]') : document.querySelectorAll('[data-rating]');
     btns.forEach((b) => b.disabled = true);
     const res = await PortalAPI('watch', {
       method: 'POST',
