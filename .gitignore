@@ -5,6 +5,12 @@ node_modules/
 dist/
 build/
 
+# Netlify CLI — estado local del sitio, nunca se sube
+.netlify/
+
+# Fotos locales (el sitio solo usa foto-nuestra.jpg; el álbum futuro va a Netlify Blobs)
+imagenes/
+
 # Sistema
 .DS_Store
 Thumbs.db
