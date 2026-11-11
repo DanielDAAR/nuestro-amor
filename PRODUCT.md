@@ -32,7 +32,8 @@ No es una app de citas ni un cuaderno de notas: es un portal **solo para dos, si
 
 - Fase 0 completada: sitio en módulos planos `css/` (base, ui, home) + `js/` (audio, ui, home); fixes de "Tu turno" (toast honesto, botón enviar disabled, `.btn-small` de 44px).
 - Fase 1 completada: tab bar de 5 pestañas (Inicio · Juegos · Música y cine · Cartas · Jardín), acceso por código de 6 dígitos, presencia (latido ~15 s), PWA instalable con offline.
-- Fase 2 en curso: cuenta regresiva compartida del próximo encuentro en Inicio (se fija, cambia y quita desde la app, fecha aún por decidirse) y pestaña **Cartas** completa (cartas con fecha de apertura + cápsula del tiempo). El latido de 15 s es el único canal de lectura: `js/api.js` expone `PortalBus`/`PortalAPI` y cada apartado se refresca cuando su pestaña está visible.
+- Fase 2 completada: cuenta regresiva compartida del próximo encuentro en Inicio y pestaña **Cartas** completa (cartas con fecha de apertura + cápsula del tiempo).
+- Fases 3-6 completadas: Música (playlist, canción del día, globo flotante, escucha sincronizada), Juegos (tres en raya, 4 en línea, memoria, ahorcado por turnos + quizzes), Cine (películas por ver con calificación y ruleta), Jardín (flores y logros derivados + reto de la semana), Álbum (fotos privadas comprimidas en el teléfono) y Diario a dos voces. El latido de 15 s es el único canal de lectura: `js/api.js` expone `PortalBus`/`PortalAPI` y cada apartado se refresca cuando su pestaña está visible.
 - Backend elegido: Netlify Functions + Blobs (mismo proveedor, sin SDK en el front); secretos solo en env vars de Netlify (`ACCESS_CODE`); **cero claves en el repo**.
 - Presencia por latido (~15 s), no websockets.
 - Zona horaria de todo lo programado: `America/Mexico_City` (misma para ambos).

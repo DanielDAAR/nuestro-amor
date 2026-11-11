@@ -29,11 +29,11 @@ Un "scrapbook digital" interactivo: una carta de amor animada con música sintet
 | Capa | Tecnología | Notas |
 |---|---|---|
 | Estructura | HTML5 | Marcado semántico en `index.html` (`<section>`, `<header>`, `<footer>`); 5 pestañas con paneles |
-| Estilos | CSS3 | `css/base.css` + `css/ui.css` + `css/home.css` + `css/portal.css` + `css/memories.css`; tokens `:root`, Grid/Flexbox, safe-area |
-| Lógica | JS vanilla | `js/audio.js` + `js/ui.js` + `js/api.js` + `js/home.js` + `js/portal.js` + `js/memories.js` (con `defer`, sin ES modules); Web Audio, IntersectionObserver, CSS 3D |
+| Estilos | CSS3 | `css/base.css` + `css/ui.css` + `css/home.css` + `css/portal.css` + `css/memories.css` + `css/music.css` + `css/games.css` + `css/cinema.css` + `css/garden.css`; tokens `:root`, Grid/Flexbox, safe-area |
+| Lógica | JS vanilla | `js/audio.js` + `js/ui.js` + `js/api.js` + `js/home.js` + `js/portal.js` + `js/memories.js` + `js/music.js` + `js/games.js` + `js/cinema.js` + `js/garden.js` (con `defer`, sin ES modules); Web Audio, IntersectionObserver, CSS 3D |
 | Audio | Web Audio API | Sin archivos mp3; se genera el carillón con osciladores |
-| Backend | Netlify Functions + Blobs | `netlify/functions/api.mjs`: acceso por código (HMAC), presencia, cuenta regresiva, cartas selladas y cápsula del tiempo (`/api?action=…`); secretos en env vars |
-| PWA | Manifest + Service Worker | `manifest.json` + `sw.js`: instalable como "Nosotros 💕" y offline con lo último guardado |
+| Backend | Netlify Functions + Blobs | `netlify/functions/api.mjs`: acceso por código (HMAC), presencia, cuenta regresiva, cartas selladas, cápsula, música con oEmbed, juegos por turnos, películas por ver, álbum, diario a dos voces, reto, quizzes y jardín derivado (`/api?action=…`); secretos en env vars |
+| PWA | Manifest + Service Worker | `manifest.json` + `sw.js`: instalable como "Nosotros 💕" y offline con lo último guardado; caché `nosotros-v3` y `action=photo` en Cache API |
 | Deploy | Netlify | Sitio estático + 1 function, fuente: GitHub |
 | Versionado | Git | Rama `master` |
 
@@ -56,14 +56,22 @@ nuestro-amor/
 │   ├── ui.css            ← Primitivas compartidas: bottom sheet iOS + lightbox
 │   ├── home.css          ← Secciones de Inicio: hero, caja, foto, jardín, tarjetas, tu turno
 │   ├── portal.css        ← Tab bar, acceso, presencia, cuenta regresiva, formularios, aviso sin conexión
-│   └── memories.css      ← Pestaña Cartas: cartas selladas, compositor, cápsula del tiempo
+│   ├── memories.css      ← Pestaña Cartas: cartas selladas, compositor, cápsula, álbum, diario
+│   ├── music.css         ← Pestaña Música y cine: canción del día, playlist, globo
+│   ├── games.css         ← Pestaña Juegos: tableros, memoria, ahorcado, quizzes
+│   ├── cinema.css        ← Pestaña Música y cine: películas por ver, ruleta
+│   └── garden.css        ← Pestaña Jardín: flores, logros, reto de la semana
 ├── js/
 │   ├── audio.js          ← Web Audio API: carillón, melodías, efectos de sonido
 │   ├── ui.js             ← Guiño dev, haptic, sheet iOS, burst, pétalos
-│   ├── api.js            ← Único archivo que toca window: PortalBus, PortalAPI, toEpoch
+│   ├── api.js            ← Único archivo que expone en `window`: PortalBus, PortalAPI, toEpoch
 │   ├── home.js           ← Mensajes, jardín, tarjetas, foto, tu turno, init
 │   ├── portal.js         ← Acceso, pestañas, presencia, relojes, cuenta regresiva, flor, SW
-│   └── memories.js       ← Pestaña Cartas: cartas con fecha + cápsula del tiempo
+│   ├── memories.js       ← Pestaña Cartas: cartas con fecha + cápsula + álbum + diario
+│   ├── music.js          ← Pestaña Música y cine: canción del día, playlist, globo, escucha juntos
+│   ├── games.js          ← Pestaña Juegos: partidas por turnos y quizzes
+│   ├── cinema.js         ← Pestaña Música y cine: películas por ver, calificación, ruleta
+│   └── garden.js         ← Pestaña Jardín: flores derivadas, logros, reto de la semana
 ├── netlify/functions/
 │   └── api.mjs           ← Function /api: auth (HMAC) + presencia (Blobs, claves por perfil)
 ├── icons/                ← Iconos PWA 192 y 512 (mismo arte del apple-touch-icon)
@@ -88,19 +96,28 @@ nuestro-amor/
 | `css/base.css` | Reset, `:root` (tokens de color), botones `.btn`/`.btn-small`/`:disabled`, partículas `.pop`, footer, `prefers-reduced-motion` |
 | `css/ui.css` | Bottom sheet iOS (backdrop, sheet, grabber, título) y lightbox de foto |
 | `css/home.css` | Hero, caja de música, foto, jardín, "cosas de nosotros", "tu turno" |
-| `css/portal.css` | Tab bar iOS, pantalla de acceso (gate), tarjeta de presencia, estados vacíos, flor "pensando en ti" |
+| `css/portal.css` | Tab bar iOS, pantalla de acceso (gate), tarjeta de presencia, cuenta regresiva, formularios, aviso sin conexión |
+| `css/memories.css` | Pestaña Cartas: cartas selladas, compositor, cápsula, álbum y diario |
+| `css/music.css` | Pestaña Música y cine: canción del día, playlist, globo flotante |
+| `css/games.css` | Pestaña Juegos: tableros, memoria, ahorcado, quizzes |
+| `css/cinema.css` | Pestaña Música y cine: películas por ver, calificación, ruleta |
+| `css/garden.css` | Pestaña Jardín: flores, logros, reto de la semana |
 | `js/audio.js` | `ensureAudio()`, `bell()`, `sndUnlock/sndMelody/sndFlip/sndChime/sndPop` — sin mp3 |
 | `js/ui.js` | Guiño de consola, título de pestaña, `haptic()`, `openSheet/closeSheet`, `burst()`, `dropPetal()` |
 | `js/api.js` | `PortalBus.on/emit` (eventos `portal:ready` / `portal:tab` / `portal:heartbeat`), `PortalAPI(action,{method,body,query,binary})` → `{ok,status,data,error}`, `PortalCache` y `toEpoch()` (fechas `datetime-local` en `America/Mexico_City`). **Único archivo que expone en `window`** |
 | `js/home.js` | Arrays `messages`/`funCards`/`funExtras`, `buildGarden()`, caja, foto, "tu turno" (`replyKey()` por perfil) y el bloque `Init` |
 | `js/portal.js` | Sesión/`localStorage`, gate, pestañas, latido de presencia (~15 s), relojes (`America/Mexico_City`), cuenta regresiva, marca diaria de presencia, flor "pensando en ti", emite `portal:ready`/`portal:tab`/`portal:heartbeat`, `register('sw.js')` |
-| `js/memories.js` | Pestaña Cartas: lista de cartas (sobre sellado si es del otro y aún no abre), compositor, borrar lo propio y la cápsula del tiempo (fijar fecha, añadir mientras esté sellada, leer al abrir). Guarda `cache-memories-v1` |
-| `netlify/functions/api.mjs` | `?action=auth` (código → token HMAC por perfil, throttle por IP), `?action=presence` (latido + thinking + marca diaria), `?action=countdown`, `?action=letters` y `?action=capsule` (sellado en servidor) |
+| `js/memories.js` | Pestaña Cartas: cartas con fecha + cápsula del tiempo + álbum de fotos privadas + diario a dos voces. Guarda `cache-memories-v1` |
+| `js/music.js` | Pestaña Música y cine: canción del día, playlist, globo flotante, escucha sincronizada. Único dueño de `#songBubble` |
+| `js/games.js` | Pestaña Juegos: partidas por turnos (tres en raya, 4 en línea, memoria, ahorcado) y quizzes |
+| `js/cinema.js` | Pestaña Música y cine: películas por ver, calificación por perfil y ruleta de sorteo |
+| `js/garden.js` | Pestaña Jardín: flores y logros derivados de la actividad, reto de la semana con foto privada |
+| `netlify/functions/api.mjs` | `?action=auth` (código → token HMAC por perfil, throttle por IP), `?action=presence` (latido + thinking + marca diaria), `?action=countdown`, `?action=letters`, `?action=capsule`, `?action=music`/`music-now`/`music-sync`, `?action=games`, `?action=album`/`photo`, `?action=diary`, `?action=watch`, `?action=challenge`, `?action=quiz`, `?action=garden` |
 | `manifest.json` | Nombre de app "Nosotros 💕", standalone, iconos 192/512 |
-| `sw.js` | Network-first con caché de respaldo: online fresco, offline lo último guardado; `/api` queda fuera |
+| `sw.js` | Network-first con caché de respaldo: online fresco, offline lo último guardado; `action=photo` en caché primero; el resto de `/api` queda fuera |
 
-> Busca con Ctrl+F: los IDs (`#waxSeal`, `#countdownCard`, `#letterForm`…) no cambian.
-> **Orden de carga:** `audio.js` → `ui.js` → `api.js` → `home.js` → `portal.js` → módulos (`memories.js`). No repitas `const`/`let` en dos archivos (colisionan en el scope global).
+> Busca con Ctrl+F: los IDs (`#waxSeal`, `#countdownCard`, `#letterForm`, `#songBubble`, `#gameBoard`, `#gardenShared`…) no cambian.
+> **Orden de carga:** `audio.js` → `ui.js` → `api.js` → `home.js` → `portal.js` → módulos (`memories.js`, `music.js`, `cinema.js`, `games.js`, `garden.js`). No repitas `const`/`let` en dos archivos (colisionan en el scope global).
 
 ---
 
@@ -184,7 +201,22 @@ No hay archivo mp3. El carillón se sintetiza con osciladores:
 - `sndMelody()` en `js/audio.js`: melodía principal (array de `[frecuencia, duración]`)
 - `sndFlip()`, `sndChime()`, `sndPop()`: efectos pequeños
 
-### Añadir una sección nueva
+### Añadir una canción
+Pega un link de YouTube o Spotify en "Música y cine" → "Nuestra playlist" y dale a "Dedicar canción". El servidor pide los metadatos (oEmbed), guarda título, artista y portada, y la pone como canción del día. El globo flotante aparece en todas las pestañas; tocarlo abre el link fuera del portal. Si el proveedor no responde, se usa la dedicatoria escrita a mano.
+
+### "Escuchar juntos"
+Desde la canción del día, toca "Escuchar juntos": el portal fija un segundo de inicio a 10 s vista y hace cuenta regresiva. Cada quien da play en su propia app de música. El portal no reproduce audio (sin cookies ni rastreadores de terceros).
+
+### Añadir una película a ver
+En "Música y cine" → "Para ver juntos", escribe un título y dale a "Añadir a la lista". Cada quien califica con 1-5 estrellas; la ruleta solo sortea entre las que los dos calificaron, sin repetir la última elegida.
+
+### Añadir un juego
+En "Juegos", elige Tres en raya, 4 en línea, Memoria o Ahorcado y toca "Empezar partida". Si ya hay una partida abierta de ese tipo, se reutiliza. Cada jugada lleva `rev` del servidor: si dos personas tocan a la vez, el segundo recibe `409` y el tablero se repinta con la versión fresca.
+
+### Reto de la semana
+En "Jardín" → "Reto de la semana", cualquiera puede proponer el reto. Para responder, sube una foto (se comprime en el teléfono a 1600 px, máx. 1,5 MB) y una nota; la foto se guarda en Blobs privados y solo se ve dentro del portal.
+
+---
 1. Añade un `<section>` dentro de `<div id="app">` en `index.html`.
 2. Añade sus estilos en `css/home.css` (o en `css/base.css` si son primitivas que reutilizarán varias pestañas).
 3. Si tiene interacción, añade el código en `js/home.js` y llama a su `init()` en el bloque `── Init ──` del final.
@@ -266,6 +298,8 @@ O si ya está conectado Netlify con GitHub, solo hacer `git push origin master` 
 | **Fase 1** | 10-11-2026 | `PRODUCT.md` (init impeccable); tab bar de 5 pestañas (iconos SVG) con estados vacíos; pantalla de acceso por código de 6 dígitos (dos perfiles, token HMAC, throttle por IP en `netlify/functions/api.mjs` + Blobs); presencia con latido ~15 s, relojes de ambos y flor "pensando en ti"; PWA (manifest "Nosotros 💕", SW offline, iconos 192/512); "Tu turno" por perfil; detector impeccable `[]`; API 18/18 en prod | El portal pasa de carta única a casa privada de dos personas |
 
 | **Fase 2** | 11-11-2026 | `js/api.js` (PortalBus + PortalAPI + `toEpoch`) y `js/memories.js`; `css/memories.css`; cuenta regresiva en Inicio (`#countdownCard`, fijar/cambiar/quitar) alimentada desde `state.countdown`; pestaña **Cartas** completa (cartas con fecha de apertura + cápsula del tiempo, `#lettersList`, `#letterForm`, `#capsuleCard`); eventos `portal:ready`/`portal:tab`/`portal:heartbeat`; marca diaria de presencia (`day-<fecha>-<perfil>.json`); píldora "sin conexión" y `cache-memories-v1`; SW `nosotros-v2` | El latido que ya existía se convierte en el canal de los módulos y las pestañas dejan de estar vacías |
+
+| **Fases 3-6** | 11-11-2026 | Música: playlist, dedicatura con oEmbed (YouTube/Spotify), canción del día, globo flotante (`#songBubble`) y escucha sincronizada (`music-sync`); Juegos: tres en raya, 4 en línea, memoria y ahorcado por turnos con `rev` y 409; Quizzes: "¿Cuánto me conoces?" y "Esto o aquello"; Cine: películas por ver con calificación 1-5 y ruleta de sorteo; Jardín: flores y logros derivados de la actividad, reto de la semana con foto privada comprimida en canvas; Álbum: fotos privadas con `photo?id=` autenticado y compresión 1600px/0.82→0.7→0.6 (1,5 MB); Diario a dos voces con revelado doble y `409 revelada`; CSS: `css/music.css`, `css/games.css`, `css/cinema.css`, `css/garden.css`; SW `nosotros-v3` con caché `action=photo` | Todas las pestañas quedan funcionales; el latido de 15 s es el único canal de tiempo real |
 
 ---
 
