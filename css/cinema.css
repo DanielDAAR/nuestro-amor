@@ -1,0 +1,47 @@
+/* ═══════════════════════════════════════════════════════════
+   CINEMA · pestaña "Música y cine"
+   (reutiliza .ios-card, .group-header, .stack, .field-label,
+   .input, .form-actions, .form-msg de css/portal.css y css/base.css)
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── lista de películas ── */
+.watch-item{
+  background:#fff;border-radius:22px;
+  padding:12px 14px;
+  margin-bottom:10px;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 8px 24px -12px rgba(0,0,0,.14);
+}
+.watch-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.watch-title{font-size:16px;font-weight:600;color:var(--ios-deep)}
+.watch-by{font-size:13px;line-height:18px;color:var(--label-secondary)}
+.watch-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.watch-label{font-size:13px;font-weight:600;color:var(--label-secondary);margin-right:6px}
+.watch-stars{display:flex;gap:4px}
+.star-btn{
+  appearance:none;border:none;background:none;cursor:pointer;
+  width:44px;height:44px;border-radius:12px;
+  font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;
+  color:var(--label-tertiary);
+}
+.star-btn.is-active{color:var(--ios-pink)}
+.star-btn:active{background:var(--fill-tertiary)}
+.star-btn:focus-visible{outline:3px solid var(--ios-pink);outline-offset:2px;border-radius:8px}
+.watch-other{
+  margin-left:auto;
+  font-size:13px;line-height:18px;color:var(--label-secondary);
+}
+.watch-item .link-btn{margin-left:auto}
+
+/* ── ruleta ── */
+.roulette-card{background:#fff;border-radius:22px;padding:14px;box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 8px 24px -12px rgba(0,0,0,.14)}
+.roulette-card .group-header{margin-bottom:10px}
+.roulette-card .btn{width:100%}
+.roulette-result{
+  margin-top:10px;
+  font-size:15px;line-height:21px;color:var(--ios-deep);
+  font-weight:600;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .star-btn{transition:none}
+}

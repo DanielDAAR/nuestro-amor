@@ -1,6 +1,7 @@
 /* ══════════════════════════════════════
    MEMORIES · pestaña "Cartas"
    cartas con fecha · cápsula del tiempo
+   álbum de fotos · diario a dos voces
    (reutiliza .ios-card, .group-header y
    las primitivas de formulario de portal.css)
    ══════════════════════════════════════ */
@@ -124,3 +125,120 @@
   white-space:pre-wrap;overflow-wrap:anywhere;
   margin-top:-4px;
 }
+
+/* ══ ÁLBUM · fotos privadas ══ */
+.album-form{
+  display:flex;flex-direction:column;gap:8px;
+  padding:16px;
+}
+.album-form .field-label{margin-top:0}
+.album-form[hidden]{display:none}
+
+/* input de archivo con cara de control iOS (objetivo ≥44px) */
+.photo-input{
+  width:100%;min-height:48px;
+  appearance:none;-webkit-appearance:none;
+  border:none;border-radius:12px;
+  background:var(--fill-tertiary);
+  box-shadow:inset 0 0 0 .5px rgba(60,60,67,.12);
+  font-family:inherit;font-size:14px;line-height:20px;color:var(--label-secondary);
+  padding:8px 10px;
+  outline:none;
+  transition:box-shadow .2s var(--spring-soft);
+}
+.photo-input::file-selector-button{
+  appearance:none;-webkit-appearance:none;border:none;cursor:pointer;
+  min-height:44px;padding:0 14px;margin-right:12px;border-radius:10px;
+  font-family:inherit;font-size:15px;font-weight:600;
+  color:var(--ios-deep);background:var(--ios-pearl);
+}
+.photo-input::-webkit-file-upload-button{
+  appearance:none;-webkit-appearance:none;border:none;cursor:pointer;
+  min-height:44px;padding:0 14px;margin-right:12px;border-radius:10px;
+  font-family:inherit;font-size:15px;font-weight:600;
+  color:var(--ios-deep);background:var(--ios-pearl);
+}
+.photo-input:focus-visible{
+  box-shadow:inset 0 0 0 .5px rgba(60,60,67,.12), 0 0 0 3px rgba(255,55,95,.18);
+}
+.photo-input:disabled{opacity:.55}
+.photo-input:disabled::file-selector-button{cursor:default}
+
+.photo-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;margin-top:12px;
+}
+.photo-grid:empty{display:none}
+.album-empty{font-size:14px;line-height:20px;color:var(--label-secondary);padding:8px 4px}
+
+.photo-cell{
+  margin:0;
+  background:#fff;border-radius:14px;overflow:hidden;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 8px 22px -12px rgba(0,0,0,.16);
+  display:flex;flex-direction:column;
+}
+.photo-cell img{
+  display:block;width:100%;height:140px;
+  object-fit:cover;background:var(--fill-tertiary);
+}
+.photo-cell img[hidden]{display:none}
+.photo-cell-fallback{
+  display:flex;align-items:center;justify-content:center;
+  height:140px;background:#E5E5EA;color:#5F5F63;
+  font-size:13px;line-height:18px;font-weight:500;
+  padding:0 10px;text-align:center;
+}
+.photo-cell-fallback[hidden]{display:none}
+.photo-meta{padding:8px 10px 4px;display:flex;flex-direction:column;gap:1px}
+.photo-phrase{
+  font-size:14px;line-height:20px;color:var(--label);
+  overflow-wrap:anywhere;
+}
+.photo-when{
+  font-size:12px;line-height:17px;color:var(--label-secondary);
+  font-variant-numeric:tabular-nums;
+}
+.photo-delete{align-self:flex-end;min-height:44px;padding:0 6px;margin-left:auto}
+
+/* ══ DIARIO A DOS VOCES ══ */
+.diary-card{padding:16px;display:flex;flex-direction:column;gap:12px}
+.diary-hint{font-size:13px;line-height:18px;color:var(--label-secondary)}
+.diary-form{
+  display:flex;flex-direction:column;gap:8px;
+  padding-top:12px;border-top:.5px solid var(--separator);
+}
+.diary-form[hidden]{display:none}
+.diary-form .field-label{margin-top:0}
+.diary-form .form-actions .btn-ghost{flex:0 0 auto}
+
+.diary-round{background:var(--fill-tertiary);border-radius:14px;padding:12px}
+.diary-round.is-new{background:var(--ios-pearl)}
+.diary-round.is-new .btn-ghost{
+  width:100%;min-height:48px;background:#fff;border-radius:12px;
+  box-shadow:inset 0 0 0 .5px rgba(60,60,67,.12);
+}
+.diary-round + .diary-round{margin-top:8px}
+.diary-actions{display:flex;align-items:center;gap:8px;min-height:44px}
+.diary-actions .btn-ghost{min-height:44px;padding:0 12px;font-size:15px}
+.diary-pill{
+  font-size:11px;line-height:16px;font-weight:600;letter-spacing:.2px;
+  color:var(--ios-deep);background:var(--ios-pearl);
+  padding:5px 9px;border-radius:999px;
+}
+.diary-round.is-new .diary-pill{background:#fff}
+.diary-when{
+  margin-left:auto;
+  font-size:12px;line-height:17px;color:var(--label-secondary);
+  font-variant-numeric:tabular-nums;
+}
+.diary-side + .diary-side{margin-top:10px;padding-top:10px;border-top:.5px solid var(--separator)}
+.diary-who{
+  display:block;
+  font-size:12px;line-height:17px;font-weight:600;color:var(--label-secondary);
+}
+.diary-text{
+  font-size:15px;line-height:22px;color:var(--label);
+  white-space:pre-wrap;overflow-wrap:anywhere;margin-top:2px;
+}
+.diary-text.is-empty{color:var(--label-secondary)}
+.diary-side.is-mine .diary-text{color:var(--ios-deep)}

@@ -1,0 +1,176 @@
+/* ══════════════════════════════════════════════
+   MUSIC · pestaña "Música"
+   canción del día · playlist · sincronizar · globo
+   (reutiliza .ios-card, .group-header, .stack y
+   las primitivas de formulario de portal.css)
+   ══════════════════════════════════════════════ */
+
+/* ── canción del día ── */
+.now-card{padding:16px}
+.now-card.is-empty{padding:22px 16px}
+.now-empty{
+  font-size:15px;line-height:21px;
+  color:var(--label-secondary);
+  text-align:center;
+}
+.now-empty[hidden]{display:none}
+.now-body{
+  display:flex;align-items:center;gap:14px;
+  padding:2px 0 14px;
+}
+.now-body[hidden]{display:none}
+.now-art{
+  width:72px;height:72px;flex:none;
+  border-radius:14px;object-fit:cover;
+  background:var(--ios-pearl);
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 6px 16px -8px rgba(0,0,0,.28);
+}
+.now-art[hidden]{display:none}
+.now-info{flex:1;min-width:0}
+.now-title{
+  font-size:18px;line-height:24px;font-weight:700;letter-spacing:-.1px;
+  color:var(--ios-deep);
+  overflow-wrap:anywhere;
+}
+.now-artist{
+  font-size:14px;line-height:20px;color:var(--label-secondary);
+  margin-top:2px;overflow-wrap:anywhere;
+}
+.now-artist[hidden]{display:none}
+.now-by{
+  display:inline-block;
+  margin-top:8px;padding:5px 11px;
+  font-size:12px;line-height:17px;font-weight:600;
+  color:var(--ios-deep);background:var(--ios-pearl);
+  border-radius:999px;
+}
+
+/* ── escucha sincronizada ── */
+.sync-card{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding-top:12px;
+  border-top:.5px solid var(--separator);
+}
+.sync-card[hidden]{display:none}
+.sync-card .btn{width:100%;max-width:270px}
+.sync-count{
+  font-size:13px;line-height:18px;
+  color:var(--label-secondary);
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+  min-height:18px;
+}
+
+/* ── formulario de dedicatoria ── */
+.song-form{
+  display:flex;flex-direction:column;gap:8px;
+  padding:16px;margin-bottom:12px;
+}
+.song-form .field-label{margin-top:0}
+
+/* ── playlist ── */
+.songs-empty{
+  background:#fff;border-radius:22px;
+  padding:22px 18px;text-align:center;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 12px 32px -12px rgba(0,0,0,.16);
+  font-size:14px;line-height:20px;color:var(--label-secondary);
+}
+.song-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px;
+}
+.song-item-art{
+  width:56px;height:56px;flex:none;
+  border-radius:12px;object-fit:cover;
+  background:var(--ios-pearl);
+}
+.song-item-art[hidden]{display:none}
+.song-item-art-empty{
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;line-height:1;color:var(--ios-deep);
+}
+.song-item-body{flex:1;min-width:0}
+.song-item-title{
+  font-size:16px;line-height:21px;font-weight:600;letter-spacing:-.1px;
+  color:var(--label);
+  overflow-wrap:anywhere;
+}
+.song-item-note{
+  font-size:14px;line-height:20px;color:var(--label-secondary);
+  margin-top:2px;
+  white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.song-item-by{
+  font-size:12px;line-height:17px;color:var(--label-secondary);
+  margin-top:4px;
+  font-variant-numeric:tabular-nums;
+}
+.song-item-actions{
+  display:flex;flex-wrap:wrap;justify-content:flex-end;gap:0 4px;
+  margin-top:2px;
+}
+.song-item-flag{
+  display:inline-flex;align-items:center;min-height:44px;padding:0 8px;
+  font-size:13px;line-height:18px;font-weight:600;
+  color:var(--ios-deep);
+}
+.song-item-actions .link-btn:disabled{opacity:.45;cursor:default}
+
+/* ── globo flotante de la canción actual ── */
+.song-bubble{
+  position:fixed;left:50%;bottom:calc(var(--safe-bottom) + 62px);
+  z-index:96;
+  display:flex;align-items:center;gap:10px;
+  max-width:calc(100% - 24px);
+  padding:8px 6px 8px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 12px 30px -8px rgba(142,65,98,.45);
+  cursor:pointer;
+  animation:bubbleFloat 4.2s ease-in-out infinite;
+}
+.song-bubble[hidden]{display:none}
+.song-bubble:active{filter:brightness(.96)}
+.song-bubble:focus-visible{outline:3px solid var(--ios-pink);outline-offset:2px}
+@keyframes bubbleFloat{
+  0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(-5px)}
+}
+.song-bubble-art{
+  width:40px;height:40px;flex:none;
+  border-radius:50%;object-fit:cover;
+  background:var(--ios-pearl);
+}
+.song-bubble-art[hidden]{display:none}
+.song-bubble-info{
+  display:flex;flex-direction:column;min-width:0;
+  padding-right:2px;
+}
+.song-bubble-title{
+  max-width:190px;
+  font-size:14px;line-height:18px;font-weight:600;
+  color:var(--label);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.song-bubble-by{
+  font-size:11px;line-height:15px;color:var(--label-secondary);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.song-bubble-close{
+  width:44px;height:44px;flex:none;
+  margin:-8px -4px -8px 0;
+  appearance:none;border:none;background:none;cursor:pointer;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:inherit;font-size:13px;font-weight:600;
+  color:var(--label-secondary);
+}
+.song-bubble-close:active{transform:scale(.92)}
+.song-bubble-close:focus-visible{outline:3px solid var(--ios-pink);outline-offset:-2px}
+
+/* ── movimiento reducido: el globo se queda quieto ── */
+@media (prefers-reduced-motion:reduce){
+  .song-bubble{animation:none}
+}
