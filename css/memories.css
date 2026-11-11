@@ -23,7 +23,7 @@
 .memories-empty-text{font-size:15px;line-height:21px;color:var(--label-secondary)}
 
 /* ── compositor de carta ── */
-.composer{margin-top:12px;background:#fff}
+.composer{margin-top:12px;padding:0 16px;background:#fff}
 .composer-toggle{
   width:100%;min-height:56px;
   display:flex;align-items:center;justify-content:space-between;gap:12px;

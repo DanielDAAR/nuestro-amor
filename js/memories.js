@@ -606,7 +606,21 @@
     fx('sndPop');
     resetAlbumForm();
     showMsg(msg, '');
-    await load();
+    showMsg($('memoriesMsg'), 'Guardado');
+    setTimeout(() => { showMsg($('memoriesMsg'), ''); }, 1500);
+
+    /* la foto nueva aparece arriba al instante */
+    if (res.ok && res.data.photo) {
+      mod.photos.unshift(res.data.photo);
+      const grid = $('photoGrid');
+      if (grid) {
+        grid.insertBefore(photoCell(res.data.photo), grid.firstChild);
+        const empty = grid.querySelector('.album-empty');
+        if (empty) empty.remove();
+      }
+      saveCache();
+    }
+    return;
   }
 
   async function deletePhoto(id) {
@@ -808,6 +822,8 @@
       if (res.error === 'revelada') {
         closeDiaryForm();
         showMsg(msg, DIARY_REVELADA);
+        showMsg($('memoriesMsg'), 'Guardado');
+        setTimeout(() => { showMsg($('memoriesMsg'), ''); }, 1500);
         await load();
         return;
       }
@@ -818,6 +834,9 @@
     const round = res.data && res.data.round;
     const revealedNow = !!(round && round.done);
     closeDiaryForm();
+
+    showMsg($('memoriesMsg'), 'Guardado');
+    setTimeout(() => { showMsg($('memoriesMsg'), ''); }, 1500);
 
     if (revealedNow) {
       fx('haptic', btn);
@@ -870,7 +889,20 @@
     if (form) { form.reset(); form.hidden = true; }
     const toggle = $('letterToggle');
     if (toggle) toggle.setAttribute('aria-expanded', 'false');
-    await load();
+
+    /* aparece arriba al instante, sin recargar toda la lista */
+    const newLetter = { ...res.data, sealed: res.data.sealed };
+    mod.letters.unshift(newLetter);
+    const list = $('lettersList');
+    if (list) {
+      list.insertBefore(letterCard(newLetter), list.firstChild);
+      const empty = $('lettersEmpty');
+      if (empty) empty.hidden = true;
+    }
+    saveCache();
+
+    showMsg($('memoriesMsg'), 'Guardado');
+    setTimeout(() => { showMsg($('memoriesMsg'), ''); }, 1500);
   }
 
   async function submitCapsuleDate(e) {
@@ -896,6 +928,8 @@
 
     if (whenEl) whenEl.value = '';
     showMsg(msg, '');
+    showMsg($('memoriesMsg'), 'Guardado');
+    setTimeout(() => { showMsg($('memoriesMsg'), ''); }, 1500);
     await load();
   }
 
@@ -921,6 +955,8 @@
 
     if (textEl) textEl.value = '';
     showMsg(msg, '');
+    showMsg($('memoriesMsg'), 'Guardado');
+    setTimeout(() => { showMsg($('memoriesMsg'), ''); }, 1500);
     await load();
   }
 

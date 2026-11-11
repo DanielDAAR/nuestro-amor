@@ -430,6 +430,8 @@
     if (form) form.reset();
     showMsg(msg, '');
     ping(sndChime);
+    showMsg($('musicMsg'), 'Guardado');
+    setTimeout(() => { showMsg($('musicMsg'), ''); }, 1500);
     await load();
   }
 

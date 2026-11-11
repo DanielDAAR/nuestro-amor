@@ -108,7 +108,7 @@ body.gate-open{overflow:hidden}
 .presence-switch:focus-visible{outline:3px solid var(--ios-pink);outline-offset:2px;border-radius:8px}
 
 /* ══ TÍTULO DE PESTAÑA (módulos) ══ */
-.panel-head{padding:18px 4px 22px}
+.panel-head{padding:18px 16px 22px}
 .panel-title{
   font-family:'Savoye LET','Snell Roundhand','Apple Chancery',cursive;
   font-size:38px;line-height:1.1;font-weight:400;letter-spacing:.4px;
