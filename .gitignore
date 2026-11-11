@@ -8,6 +8,9 @@ build/
 # Netlify CLI — estado local del sitio, nunca se sube
 .netlify/
 
+# Secretos locales: el código real vive solo en env vars de Netlify
+.env
+
 # Fotos locales (el sitio solo usa foto-nuestra.jpg; el álbum futuro va a Netlify Blobs)
 imagenes/
 

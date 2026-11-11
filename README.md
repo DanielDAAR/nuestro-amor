@@ -29,10 +29,10 @@ Un "scrapbook digital" interactivo: una carta de amor animada con música sintet
 | Capa | Tecnología | Notas |
 |---|---|---|
 | Estructura | HTML5 | Marcado semántico en `index.html` (`<section>`, `<header>`, `<footer>`); 5 pestañas con paneles |
-| Estilos | CSS3 | `css/base.css` + `css/ui.css` + `css/home.css` + `css/portal.css`; tokens `:root`, Grid/Flexbox, safe-area |
-| Lógica | JS vanilla | `js/audio.js` + `js/ui.js` + `js/home.js` + `js/portal.js` (con `defer`, sin ES modules); Web Audio, IntersectionObserver, CSS 3D |
+| Estilos | CSS3 | `css/base.css` + `css/ui.css` + `css/home.css` + `css/portal.css` + `css/memories.css`; tokens `:root`, Grid/Flexbox, safe-area |
+| Lógica | JS vanilla | `js/audio.js` + `js/ui.js` + `js/api.js` + `js/home.js` + `js/portal.js` + `js/memories.js` (con `defer`, sin ES modules); Web Audio, IntersectionObserver, CSS 3D |
 | Audio | Web Audio API | Sin archivos mp3; se genera el carillón con osciladores |
-| Backend | Netlify Functions + Blobs | `netlify/functions/api.mjs`: acceso por código (HMAC) y presencia (`/api?action=…`); secretos en env vars |
+| Backend | Netlify Functions + Blobs | `netlify/functions/api.mjs`: acceso por código (HMAC), presencia, cuenta regresiva, cartas selladas y cápsula del tiempo (`/api?action=…`); secretos en env vars |
 | PWA | Manifest + Service Worker | `manifest.json` + `sw.js`: instalable como "Nosotros 💕" y offline con lo último guardado |
 | Deploy | Netlify | Sitio estático + 1 function, fuente: GitHub |
 | Versionado | Git | Rama `master` |
@@ -55,12 +55,15 @@ nuestro-amor/
 │   ├── base.css          ← Reset, tokens :root, botones, partículas, footer, reduced-motion
 │   ├── ui.css            ← Primitivas compartidas: bottom sheet iOS + lightbox
 │   ├── home.css          ← Secciones de Inicio: hero, caja, foto, jardín, tarjetas, tu turno
-│   └── portal.css        ← Tab bar, pantalla de acceso, presencia, estados vacíos, flor
+│   ├── portal.css        ← Tab bar, acceso, presencia, cuenta regresiva, formularios, aviso sin conexión
+│   └── memories.css      ← Pestaña Cartas: cartas selladas, compositor, cápsula del tiempo
 ├── js/
 │   ├── audio.js          ← Web Audio API: carillón, melodías, efectos de sonido
 │   ├── ui.js             ← Guiño dev, haptic, sheet iOS, burst, pétalos
+│   ├── api.js            ← Único archivo que toca window: PortalBus, PortalAPI, toEpoch
 │   ├── home.js           ← Mensajes, jardín, tarjetas, foto, tu turno, init
-│   └── portal.js         ← Acceso, pestañas, presencia, relojes, flor, registro del SW
+│   ├── portal.js         ← Acceso, pestañas, presencia, relojes, cuenta regresiva, flor, SW
+│   └── memories.js       ← Pestaña Cartas: cartas con fecha + cápsula del tiempo
 ├── netlify/functions/
 │   └── api.mjs           ← Function /api: auth (HMAC) + presencia (Blobs, claves por perfil)
 ├── icons/                ← Iconos PWA 192 y 512 (mismo arte del apple-touch-icon)
@@ -88,14 +91,16 @@ nuestro-amor/
 | `css/portal.css` | Tab bar iOS, pantalla de acceso (gate), tarjeta de presencia, estados vacíos, flor "pensando en ti" |
 | `js/audio.js` | `ensureAudio()`, `bell()`, `sndUnlock/sndMelody/sndFlip/sndChime/sndPop` — sin mp3 |
 | `js/ui.js` | Guiño de consola, título de pestaña, `haptic()`, `openSheet/closeSheet`, `burst()`, `dropPetal()` |
+| `js/api.js` | `PortalBus.on/emit` (eventos `portal:ready` / `portal:tab` / `portal:heartbeat`), `PortalAPI(action,{method,body,query,binary})` → `{ok,status,data,error}`, `PortalCache` y `toEpoch()` (fechas `datetime-local` en `America/Mexico_City`). **Único archivo que expone en `window`** |
 | `js/home.js` | Arrays `messages`/`funCards`/`funExtras`, `buildGarden()`, caja, foto, "tu turno" (`replyKey()` por perfil) y el bloque `Init` |
-| `js/portal.js` | Sesión/`localStorage`, gate, pestañas, latido de presencia (~15 s), relojes (`America/Mexico_City`), flor, `register('sw.js')` |
-| `netlify/functions/api.mjs` | `?action=auth` (código → token HMAC por perfil, throttle por IP) y `?action=presence` (latido + thinking en Blobs) |
+| `js/portal.js` | Sesión/`localStorage`, gate, pestañas, latido de presencia (~15 s), relojes (`America/Mexico_City`), cuenta regresiva, marca diaria de presencia, flor "pensando en ti", emite `portal:ready`/`portal:tab`/`portal:heartbeat`, `register('sw.js')` |
+| `js/memories.js` | Pestaña Cartas: lista de cartas (sobre sellado si es del otro y aún no abre), compositor, borrar lo propio y la cápsula del tiempo (fijar fecha, añadir mientras esté sellada, leer al abrir). Guarda `cache-memories-v1` |
+| `netlify/functions/api.mjs` | `?action=auth` (código → token HMAC por perfil, throttle por IP), `?action=presence` (latido + thinking + marca diaria), `?action=countdown`, `?action=letters` y `?action=capsule` (sellado en servidor) |
 | `manifest.json` | Nombre de app "Nosotros 💕", standalone, iconos 192/512 |
 | `sw.js` | Network-first con caché de respaldo: online fresco, offline lo último guardado; `/api` queda fuera |
 
-> Busca con Ctrl+F: los IDs (`#waxSeal`, `#replyInput`…) no cambian.
-> **Orden de carga:** `audio.js` → `ui.js` → `home.js` → `portal.js`. No repitas `const`/`let` en dos archivos (colisionan en el scope global).
+> Busca con Ctrl+F: los IDs (`#waxSeal`, `#countdownCard`, `#letterForm`…) no cambian.
+> **Orden de carga:** `audio.js` → `ui.js` → `api.js` → `home.js` → `portal.js` → módulos (`memories.js`). No repitas `const`/`let` en dos archivos (colisionan en el scope global).
 
 ---
 
@@ -145,13 +150,21 @@ netlify deploy --prod --dir=.
 
 Al cambiarlo, ambos deben entrar otra vez (los tokens viejos dejan de valer).
 
+### Cuenta regresiva, cartas y cápsula (Fase 2)
+
+- **Cuenta regresiva** (Inicio, bajo Presencia): `#countdownValue` muestra los días que faltan, "Sin fecha todavía" o "Ya pasó". El formulario (`#countdownForm`) guarda `{when, label}`; el botón `#countdownEdit` lo abre y `#countdownClear` lo borra. La fecha se interpreta en `America/Mexico_City` con `toEpoch()` (`js/api.js`) — nunca `new Date('YYYY-MM-DD')`.
+- **Cartas** (`#lettersList`, `#letterForm`): título, texto y fecha de apertura opcional. Mientras esté sellada, **el otro solo ve el sobre** (el servidor no manda el texto); el autor ve la suya completa. Cada quien borra lo suyo (`Borrar`).
+- **Cápsula del tiempo** (`#capsuleCard`, `#capsuleForm`, `#capsuleList`): se fija la fecha de apertura, ambos pueden añadir mientras esté sellada y al abrir se lee todo. Lo del otro se oculta hasta la fecha.
+- **Sin conexión:** píldora "Sin conexión · mostrando lo último" (`#offlinePill`, `js/portal.js`) y botones de guardar deshabilitados; `memories.js` repinta desde `cache-memories-v1`.
+
 ### Añadir una pestaña nueva (siguientes fases)
 
 1. Crea el panel en `index.html`: `<div class="tab-panel" id="panel-NOMBRE" role="tabpanel" hidden>…</div>` (fuera de `#panel-inicio`, dentro de `#app`).
 2. Añade su botón en `<nav class="tabbar">` con `data-tab="NOMBRE"` y `aria-controls="panel-NOMBRE"` (icono SVG dibujado, no emoji).
-3. Estilos en `css/portal.css` (usa los patrones existentes: `.ios-card`/`.group-header` de `home.css`).
-4. Lógica en `js/portal.js` (o un `js/NOMBRE.js` cargado después, sin repetir `const`/`let`).
-5. Si consume la API, añade un `action` en `netlify/functions/api.mjs`.
+3. Estilos en `css/NOMBRE.css` (usa los patrones existentes: `.ios-card`/`.group-header` de `css/base.css`, y `.field-label`/`.input`/`.form-actions` de `css/portal.css`).
+4. Lógica en `js/NOMBRE.js` **dentro de un IIFE**, cargado después de `portal.js`: escucha `portal:ready` (una sola vez), `portal:tab` y `portal:heartbeat`, y llama a la API con `PortalAPI()`. No declares nada en el scope global (solo `js/api.js` toca `window`).
+5. Si consume datos nuevos, añade un `action` en `netlify/functions/api.mjs`.
+6. Añade el CSS y el JS nuevos a `ASSETS` en `sw.js`.
 
 
 ### Cambiar colores
@@ -252,6 +265,8 @@ O si ya está conectado Netlify con GitHub, solo hacer `git push origin master` 
 
 | **Fase 1** | 10-11-2026 | `PRODUCT.md` (init impeccable); tab bar de 5 pestañas (iconos SVG) con estados vacíos; pantalla de acceso por código de 6 dígitos (dos perfiles, token HMAC, throttle por IP en `netlify/functions/api.mjs` + Blobs); presencia con latido ~15 s, relojes de ambos y flor "pensando en ti"; PWA (manifest "Nosotros 💕", SW offline, iconos 192/512); "Tu turno" por perfil; detector impeccable `[]`; API 18/18 en prod | El portal pasa de carta única a casa privada de dos personas |
 
+| **Fase 2** | 11-11-2026 | `js/api.js` (PortalBus + PortalAPI + `toEpoch`) y `js/memories.js`; `css/memories.css`; cuenta regresiva en Inicio (`#countdownCard`, fijar/cambiar/quitar) alimentada desde `state.countdown`; pestaña **Cartas** completa (cartas con fecha de apertura + cápsula del tiempo, `#lettersList`, `#letterForm`, `#capsuleCard`); eventos `portal:ready`/`portal:tab`/`portal:heartbeat`; marca diaria de presencia (`day-<fecha>-<perfil>.json`); píldora "sin conexión" y `cache-memories-v1`; SW `nosotros-v2` | El latido que ya existía se convierte en el canal de los módulos y las pestañas dejan de estar vacías |
+
 ---
 
-*Última actualización: 10 de noviembre de 2026 · Para ti, Kitzya 🎀*
+*Última actualización: 11 de noviembre de 2026 · Para ti, Kitzya 🎀*

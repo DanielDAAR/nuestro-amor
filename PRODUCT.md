@@ -31,13 +31,14 @@ No es una app de citas ni un cuaderno de notas: es un portal **solo para dos, si
 ## Capabilities and Constraints
 
 - Fase 0 completada: sitio en módulos planos `css/` (base, ui, home) + `js/` (audio, ui, home); fixes de "Tu turno" (toast honesto, botón enviar disabled, `.btn-small` de 44px).
-- Fase 1 en curso: tab bar de 5 pestañas (Inicio · Juegos · Música y cine · Cartas · Jardín), acceso por código de 6 dígitos, presencia (latido ~15 s), PWA instalable con offline.
+- Fase 1 completada: tab bar de 5 pestañas (Inicio · Juegos · Música y cine · Cartas · Jardín), acceso por código de 6 dígitos, presencia (latido ~15 s), PWA instalable con offline.
+- Fase 2 en curso: cuenta regresiva compartida del próximo encuentro en Inicio (se fija, cambia y quita desde la app, fecha aún por decidirse) y pestaña **Cartas** completa (cartas con fecha de apertura + cápsula del tiempo). El latido de 15 s es el único canal de lectura: `js/api.js` expone `PortalBus`/`PortalAPI` y cada apartado se refresca cuando su pestaña está visible.
 - Backend elegido: Netlify Functions + Blobs (mismo proveedor, sin SDK en el front); secretos solo en env vars de Netlify (`ACCESS_CODE`); **cero claves en el repo**.
 - Presencia por latido (~15 s), no websockets.
 - Zona horaria de todo lo programado: `America/Mexico_City` (misma para ambos).
 - Restricciones duras: cero build, cero framework, cero npm, sin ES modules en el front; sin refs inline ni bucles de re-render; `prefers-reduced-motion` respetado; targets táctiles ≥44px; contraste AA; español de tú.
 - **Sin decidir (registro, no invención):** ¿notificaciones push? De momento "pensando en ti" y la presencia se ven al abrir la app.
-- **Sin decidir (registro):** fecha real del próximo encuentro para la cuenta regresiva — hasta entonces, placeholder editable desde la propia app.
+- **Sin decidir (registro):** fecha real del próximo encuentro — el campo existe y es editable desde la propia app; nace vacío, nadie lo inventa.
 - **Sin decidir (registro):** el contenido de los 10 mensajes de Inicio mantiene hoy su voz original (Daniel → Kitzya); adaptarlo por perfil queda para la fase de contenido de cartas.
 
 ## Brand Commitments
