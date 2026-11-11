@@ -46,6 +46,21 @@
     if (node) node.textContent = text;
   }
 
+  /* ── esqueleto de carga (ghost place) ── */
+  function songSkeleton(show) {
+    const nowCard = $('nowCard');
+    const nowBody = $('nowBody');
+    const empty = $('nowEmpty');
+    if (!nowCard) return;
+    if (show) {
+      nowCard.classList.add('is-loading');
+      if (nowBody) nowBody.hidden = true;
+      if (empty) empty.hidden = true;
+    } else {
+      nowCard.classList.remove('is-loading');
+    }
+  }
+
   function nameOf(who) {
     return NAMES[who] || who || 'alguien';
   }
@@ -416,10 +431,12 @@
     const label = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
     showMsg(msg, '');
+    songSkeleton(true);
 
     const res = await PortalAPI('music', { method: 'POST', body: { url: url, note: note } });
 
     if (btn) { btn.disabled = false; btn.textContent = label; }
+    songSkeleton(false);
     if (!res.ok) {
       if (res.status === 0) setNetwork(false);
       showMsg(msg, errorText(res));
@@ -438,8 +455,10 @@
   async function setNow(id) {
     if (!id) return;
     showMsg($('musicMsg'), '');
+    songSkeleton(true);
 
     const res = await PortalAPI('music-now', { method: 'POST', body: { songId: id } });
+    songSkeleton(false);
     if (!res.ok) { showMsg($('musicMsg'), errorText(res)); return; }
 
     mod.now = res.data || { songId: id };

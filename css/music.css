@@ -8,10 +8,16 @@
 /* ── canción del día ── */
 .now-card{padding:16px}
 .now-card.is-empty{padding:22px 16px}
+.now-card.is-loading{
+  padding:16px;
+  pointer-events:none;
+  opacity:.85;
+}
 .now-empty{
   font-size:15px;line-height:21px;
   color:var(--label-secondary);
   text-align:center;
+  padding:26px 16px;
 }
 .now-empty[hidden]{display:none}
 .now-body{
@@ -44,6 +50,26 @@
   color:var(--ios-deep);background:var(--ios-pearl);
   border-radius:999px;
 }
+
+/* ── ghost place / esqueleto de carga ── */
+.skeleton{
+  background:linear-gradient(90deg, var(--fill-tertiary) 25%, var(--fill-primary) 50%, var(--fill-tertiary) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s infinite;
+  border-radius:12px;
+  color:transparent;
+}
+@keyframes shimmer{
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
+}
+.skeleton-line{
+  height:16px;border-radius:8px;
+}
+.skeleton-line.short{width:40%;margin-top:6px}
+.skeleton-line.med{width:70%;margin-top:6px}
+.skeleton-line.long{width:90%;margin-top:6px}
+.skeleton-art{width:72px;height:72px;border-radius:14px;margin-right:14px}
 
 /* ── escucha sincronizada ── */
 .sync-card{

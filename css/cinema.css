@@ -33,15 +33,41 @@
 .watch-item .link-btn{margin-left:auto}
 
 /* ── ruleta ── */
-.roulette-card{background:#fff;border-radius:22px;padding:14px;box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 8px 24px -12px rgba(0,0,0,.14)}
+.roulette-card{
+  background:#fff;
+  border-radius:22px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 8px 24px -12px rgba(0,0,0,.14);
+}
 .roulette-card .group-header{margin-bottom:10px}
-.roulette-card .btn{width:100%}
+.roulette-card .btn{width:100%;min-height:48px}
 .roulette-result{
   margin-top:10px;
   font-size:15px;line-height:21px;color:var(--ios-deep);
   font-weight:600;
 }
 
+/* espacio entre secciones dentro de Música y cine */
+.watch-form,.watch-item,.song-form,.song-item{
+  margin-bottom:12px;
+}
+
 @media (prefers-reduced-motion:reduce){
   .star-btn{transition:none}
+}
+
+/* ── esqueleto de carga para cine ── */
+.roulette-card.is-loading{
+  pointer-events:none;
+  opacity:.85;
+}
+.roulette-result.is-loading{
+  height:21px;
+  border-radius:8px;
+  margin-top:10px;
+}
+.watch-item.is-loading{
+  pointer-events:none;
+  opacity:.85;
 }

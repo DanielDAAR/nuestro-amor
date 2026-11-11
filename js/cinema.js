@@ -42,6 +42,20 @@
     if (res.status === 401) return 'Tu sesión ya no es válida. Entra otra vez.';
     return 'No se pudo guardar. Inténtalo otra vez.';
   }
+  function listSkeleton(show) {
+    const list = $('#watchList');
+    const result = $('#rouletteResult');
+    if (!list || !result) return;
+    if (show) {
+      list.classList.add('is-loading');
+      result.classList.add('is-loading');
+      result.textContent = '';
+      result.hidden = false;
+    } else {
+      list.classList.remove('is-loading');
+      result.classList.remove('is-loading');
+    }
+  }
   function setNetwork(ok) {
     const btns = ['watchSubmit'];
     btns.forEach((id) => { const b = $(id); if (b) b.disabled = !ok; });
@@ -51,6 +65,7 @@
   async function load() {
     if (!mod.ready || mod.fetching) return;
     mod.fetching = true;
+    listSkeleton(true);
     try {
       const res = await PortalAPI('watch');
       if (res.ok && res.data && Array.isArray(res.data.items)) {
@@ -66,6 +81,7 @@
       renderRoulette();
     } finally {
       mod.fetching = false;
+      listSkeleton(false);
     }
   }
 
@@ -132,12 +148,13 @@
     const card = document.querySelector('.watch-item[data-watch-id="' + id + '"]');
     const btns = card ? card.querySelectorAll('[data-rating]') : document.querySelectorAll('[data-rating]');
     btns.forEach((b) => b.disabled = true);
+    listSkeleton(true);
     const res = await PortalAPI('watch', {
       method: 'POST',
       body: { id: id, rating: rating },
     });
     btns.forEach((b) => b.disabled = false);
-    if (!res.ok) { showMsg($('#watchMsg'), errorText(res)); return; }
+    if (!res.ok) { listSkeleton(false); showMsg($('#watchMsg'), errorText(res)); return; }
     showMsg($('#watchMsg'), '');
     await load();
   }
@@ -145,8 +162,9 @@
   async function deleteItem(id) {
     if (!id) return;
     if (!confirm('¿Borrar esta película de la lista?')) return;
+    listSkeleton(true);
     const res = await PortalAPI('watch', { method: 'DELETE', body: { id: id } });
-    if (!res.ok) { showMsg($('#watchMsg'), errorText(res)); return; }
+    if (!res.ok) { listSkeleton(false); showMsg($('#watchMsg'), errorText(res)); return; }
     showMsg($('#watchMsg'), '');
     await load();
   }
@@ -214,10 +232,12 @@
     const label = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
     showMsg($('#watchMsg'), '');
+    listSkeleton(true);
 
     const res = await PortalAPI('watch', { method: 'POST', body: { title: title } });
 
     if (btn) { btn.disabled = false; btn.textContent = label; }
+    listSkeleton(false);
     if (!res.ok) { showMsg($('#watchMsg'), errorText(res)); return; }
     if ($('#watchTitle')) $('#watchTitle').value = '';
     showMsg($('#watchMsg'), '');
