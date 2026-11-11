@@ -285,9 +285,21 @@
     else if (!game) {
       main = mod.kind === 'hangman'
         ? 'Escribe una palabra de al menos 3 letras y que la adivine ' + otherName() + '.'
-        : 'Todavía no hay partida de ' + KIND_NAME[mod.kind].toLowerCase() + '. Toca «Empezar partida».';
+        : 'Todavía no hay partida de ' + KIND_NAME[mod.kind].toLowerCase() + '.';
+    } else if (game.status === 'done') {
+      main = endText(game);
     } else {
-      main = statusFor(game);
+      const mine = game.turn === mod.me;
+      if (game.kind === 'hangman') {
+        if (mine) return node.appendChild(el('span', 'game-status-main', 'Tu turno: adivina la palabra letra por letra.'));
+        return node.appendChild(el('span', 'game-status-main', 'Escribiste la palabra. Espera a que ' + otherName() + ' la adivine.'));
+      }
+      if (game.kind === 'memory') {
+        const score = game.score || {};
+        const turno = mine ? 'Tu turno: destapa dos cartas.' : 'Esperando a ' + otherName() + '...';
+        return node.appendChild(el('span', 'game-status-main', turno + '  Marcador: tú ' + (score[mod.me] || 0) + ' · ' + otherName() + ' ' + (score[other()] || 0)));
+      }
+      return node.appendChild(el('span', 'game-status-main', mine ? 'Tu turno.' : 'Esperando a ' + otherName() + '...'));
     }
     node.appendChild(el('span', 'game-status-main', main));
     if (mod.note) node.appendChild(el('span', 'game-status-note', mod.note));
@@ -380,12 +392,21 @@
     return where + ', ' + (value === mark ? 'tu ficha' : 'su ficha');
   }
 
+  function getWinLine(board) {
+    for (const line of TTT_LINES) {
+      const a = board[line[0]];
+      if (a && a === board[line[1]] && a === board[line[2]]) return line;
+    }
+    return null;
+  }
+
   function renderTtt(game, board) {
     board.className = 'game-board board-ttt';
     board.textContent = '';
     const cells = Array.isArray(game.board) ? game.board : [];
     const mark = myMark(game);
     const playable = canPlay(game);
+    const winLine = game.status === 'done' && game.winner ? getWinLine(cells) : null;
     for (let i = 0; i < TTT_CELLS; i++) {
       const value = cells[i] ? String(cells[i]) : '';
       const cell = el('button', 'board-cell');
@@ -399,6 +420,7 @@
         cell.disabled = !playable;
       }
       if (mod.lastCells.indexOf(i) >= 0) cell.classList.add('is-last');
+      if (winLine && winLine.indexOf(i) >= 0) cell.classList.add('is-win');
       cell.setAttribute('aria-label', cellLabel('ttt', i, value, mark));
       board.appendChild(cell);
     }
@@ -1003,6 +1025,7 @@
           mod.game = null;
           mod.lastCells = [];
           render();
+          create();  // crear la partida automáticamente al elegir el juego
         }
         saveCache();
       });
