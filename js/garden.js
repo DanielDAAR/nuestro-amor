@@ -260,6 +260,8 @@
     if (!res.ok) { showMsg($('#challengeMsg'), errorText(res)); return; }
     if (input) input.value = '';
     showMsg($('#challengeMsg'), '');
+    showMsg($('challengeMsg'), 'Guardado');
+    setTimeout(() => { showMsg($('challengeMsg'), ''); }, 1500);
     await loadChallenge();
   }
 
@@ -280,6 +282,8 @@
     });
     if (!challengeRes.ok) { showMsg($('#challengeMsg'), errorText(challengeRes)); return; }
     showMsg($('#challengeMsg'), '');
+    showMsg($('challengeMsg'), 'Guardado');
+    setTimeout(() => { showMsg($('challengeMsg'), ''); }, 1500);
     if (photoInput) photoInput.value = '';
     if (noteInput) noteInput.value = '';
     await loadChallenge();
