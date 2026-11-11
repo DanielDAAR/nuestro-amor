@@ -1,0 +1,126 @@
+/* ══════════════════════════════════════
+   MEMORIES · pestaña "Cartas"
+   cartas con fecha · cápsula del tiempo
+   (reutiliza .ios-card, .group-header y
+   las primitivas de formulario de portal.css)
+   ══════════════════════════════════════ */
+
+/* ── estructura ── */
+.memories-msg{padding:0 4px 12px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.stack:empty{display:none}
+
+/* ── estado vacío ── */
+.memories-empty{
+  background:#fff;border-radius:22px;
+  padding:26px 22px;text-align:center;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 12px 32px -12px rgba(0,0,0,.16);
+  margin-bottom:12px;
+}
+.memories-empty[hidden]{display:none}
+.memories-empty-emoji{font-size:30px;line-height:1;margin-bottom:8px}
+.memories-empty-text{font-size:15px;line-height:21px;color:var(--label-secondary)}
+
+/* ── compositor de carta ── */
+.composer{margin-top:12px;background:#fff}
+.composer-toggle{
+  width:100%;min-height:56px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 18px;
+  appearance:none;border:none;background:none;cursor:pointer;
+  font-family:inherit;font-size:17px;font-weight:600;text-align:left;
+  color:var(--ios-deep);
+}
+.composer-toggle:active{opacity:.6}
+.composer-toggle:focus-visible{outline:3px solid var(--ios-pink);outline-offset:-3px;border-radius:18px}
+.composer-plus{
+  font-size:24px;line-height:1;font-weight:400;color:var(--ios-pink);
+  transition:transform .25s var(--spring);
+}
+.composer-toggle[aria-expanded="true"] .composer-plus{transform:rotate(45deg)}
+.composer-form{
+  display:flex;flex-direction:column;gap:8px;
+  padding:14px 18px 18px;
+  border-top:.5px solid var(--separator);
+}
+.composer-form[hidden]{display:none}
+.composer-form .field-label{margin-top:0}
+
+/* ── cartas ── */
+.letter-card{margin:0}
+.letter-head{
+  width:100%;min-height:56px;
+  display:flex;align-items:center;gap:10px;
+  padding:0 16px;
+  appearance:none;border:none;background:none;
+  font-family:inherit;text-align:left;
+  cursor:pointer;
+}
+.letter-head:disabled{cursor:default}
+.letter-head:focus-visible{outline:3px solid var(--ios-pink);outline-offset:-3px;border-radius:18px}
+.letter-who{font-size:16px;line-height:21px;font-weight:600;color:var(--label)}
+.letter-when{
+  margin-left:auto;
+  font-size:13px;line-height:18px;color:var(--label-secondary);
+  font-variant-numeric:tabular-nums;
+}
+.letter-caret{
+  font-size:19px;line-height:1;color:var(--label-tertiary);
+  transition:transform .25s var(--spring);
+}
+.letter-card.is-open .letter-caret{transform:rotate(90deg)}
+.letter-content{display:none;padding:0 16px 6px}
+.letter-card.is-open .letter-content{display:block}
+.letter-title{
+  font-size:18px;line-height:24px;font-weight:700;letter-spacing:-.1px;
+  color:var(--ios-deep);margin-bottom:4px;
+}
+.letter-text{
+  font-size:16px;line-height:24px;color:var(--label);
+  white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.letter-foot{
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+  min-height:44px;padding:4px 12px 10px 16px;
+}
+.letter-pill{
+  font-size:12px;line-height:17px;font-weight:600;
+  color:var(--ios-deep);background:var(--ios-pearl);
+  padding:6px 10px;border-radius:999px;
+}
+.letter-card.is-sealed .letter-pill{
+  color:var(--label-secondary);background:var(--fill-tertiary);
+}
+.letter-foot .link-btn{margin-left:auto}
+
+/* ── cápsula del tiempo ── */
+.capsule{padding:16px}
+.capsule-status{
+  font-size:19px;line-height:25px;font-weight:700;letter-spacing:-.2px;
+  color:var(--ios-deep);
+}
+.capsule-sub{font-size:14px;line-height:20px;color:var(--label-secondary);margin-top:2px}
+.capsule-form{
+  display:flex;flex-direction:column;gap:8px;
+  margin-top:14px;padding-top:14px;
+  border-top:.5px solid var(--separator);
+}
+.capsule-form[hidden]{display:none}
+.capsule-form .field-label{margin-top:0}
+.capsule-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.capsule-list:empty{display:none}
+.capsule-empty{font-size:14px;line-height:20px;color:var(--label-secondary);padding:2px 0}
+.capsule-entry{background:var(--fill-tertiary);border-radius:14px;padding:10px 12px}
+.capsule-entry-head{display:flex;align-items:center;gap:8px;min-height:44px}
+.capsule-entry-who{font-size:13px;line-height:18px;font-weight:600;color:var(--label-secondary)}
+.capsule-entry-when{
+  margin-left:auto;
+  font-size:12px;line-height:17px;color:var(--label-secondary);
+  font-variant-numeric:tabular-nums;
+}
+.capsule-entry-head .link-btn{min-height:44px;padding:0 6px}
+.capsule-entry-text{
+  font-size:15px;line-height:22px;color:var(--label);
+  white-space:pre-wrap;overflow-wrap:anywhere;
+  margin-top:-4px;
+}
