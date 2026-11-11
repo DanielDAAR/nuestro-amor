@@ -1,7 +1,8 @@
-# 💕 nuestro-amor — Carta interactiva para Kitzya
+# 💕 nuestro-amor — Portal privado de Daniel y Kitzya
 
-Sitio de una sola página, estilo iOS, hecho con ❤️ para Kitzya.
-Cero dependencias, cero build, se abre directo en el navegador.
+Portal de dos personas, estilo iOS, hecho con ❤️.
+Cero build, cero framework: **archivos planos que se abren con doble clic**.
+La carta original sigue viva en la pestaña **Inicio**; el acceso por código y la presencia van por Netlify Functions.
 
 ---
 
@@ -12,6 +13,8 @@ Cero dependencias, cero build, se abre directo en el navegador.
 | **Web en vivo** | https://idyllic-wisp-bf5826.netlify.app |
 | **Repositorio** | https://github.com/DanielDAAR/nuestro-amor.git |
 | **Rama** | `master` |
+
+> **Acceso:** el código de 6 dígitos vive en variables de entorno de Netlify (`ACCESS_CODE`), nunca en el repo. Para cambiarlo: `netlify env:set ACCESS_CODE "nuevo-código"` y redesplegar.
 
 ---
 
@@ -25,11 +28,13 @@ Un "scrapbook digital" interactivo: una carta de amor animada con música sintet
 
 | Capa | Tecnología | Notas |
 |---|---|---|
-| Estructura | HTML5 | Marcado semántico en `index.html` (`<section>`, `<header>`, `<footer>`) |
-| Estilos | CSS3 | `css/base.css` + `css/ui.css` + `css/home.css`; tokens `:root`, Grid/Flexbox, safe-area |
-| Lógica | JS vanilla | `js/audio.js` + `js/ui.js` + `js/home.js` (con `defer`, sin ES modules); Web Audio, IntersectionObserver, CSS 3D |
+| Estructura | HTML5 | Marcado semántico en `index.html` (`<section>`, `<header>`, `<footer>`); 5 pestañas con paneles |
+| Estilos | CSS3 | `css/base.css` + `css/ui.css` + `css/home.css` + `css/portal.css`; tokens `:root`, Grid/Flexbox, safe-area |
+| Lógica | JS vanilla | `js/audio.js` + `js/ui.js` + `js/home.js` + `js/portal.js` (con `defer`, sin ES modules); Web Audio, IntersectionObserver, CSS 3D |
 | Audio | Web Audio API | Sin archivos mp3; se genera el carillón con osciladores |
-| Deploy | Netlify | Sitio estático directo, fuente: GitHub |
+| Backend | Netlify Functions + Blobs | `netlify/functions/api.mjs`: acceso por código (HMAC) y presencia (`/api?action=…`); secretos en env vars |
+| PWA | Manifest + Service Worker | `manifest.json` + `sw.js`: instalable como "Nosotros 💕" y offline con lo último guardado |
+| Deploy | Netlify | Sitio estático + 1 function, fuente: GitHub |
 | Versionado | Git | Rama `master` |
 
 **Por qué no hay React / Vite / Tailwind:** Durante el desarrollo el proyecto pasó por una versión con React + Vite + Tailwind + GSAP que causó errores persistentes de refs y build (`TypeError: b is not a function`, bucle infinito de re-renders). Se rescató a HTML puro y funciona garantizado.
@@ -41,14 +46,24 @@ Un "scrapbook digital" interactivo: una carta de amor animada con música sintet
 ```
 nuestro-amor/
 ├── index.html            ← Solo el marcado HTML (sin CSS ni JS inline)
+├── PRODUCT.md            ← Verdad de producto (init de impeccable)
+├── manifest.json         ← PWA: "Nosotros 💕" instalable
+├── sw.js                 ← Service Worker: offline con lo último guardado
+├── package.json          ← SOLO de la function /api (back); el front no tiene build
+├── package-lock.json
 ├── css/
 │   ├── base.css          ← Reset, tokens :root, botones, partículas, footer, reduced-motion
 │   ├── ui.css            ← Primitivas compartidas: bottom sheet iOS + lightbox
-│   └── home.css          ← Secciones de Inicio: hero, caja, foto, jardín, tarjetas, tu turno
+│   ├── home.css          ← Secciones de Inicio: hero, caja, foto, jardín, tarjetas, tu turno
+│   └── portal.css        ← Tab bar, pantalla de acceso, presencia, estados vacíos, flor
 ├── js/
 │   ├── audio.js          ← Web Audio API: carillón, melodías, efectos de sonido
 │   ├── ui.js             ← Guiño dev, haptic, sheet iOS, burst, pétalos
-│   └── home.js           ← Mensajes, jardín, tarjetas, foto, tu turno, init
+│   ├── home.js           ← Mensajes, jardín, tarjetas, foto, tu turno, init
+│   └── portal.js         ← Acceso, pestañas, presencia, relojes, flor, registro del SW
+├── netlify/functions/
+│   └── api.mjs           ← Function /api: auth (HMAC) + presencia (Blobs, claves por perfil)
+├── icons/                ← Iconos PWA 192 y 512 (mismo arte del apple-touch-icon)
 ├── foto-nuestra.jpg      ← La foto (se muestra y se amplía en lightbox)
 ├── og-image.jpg          ← Imagen de preview de WhatsApp (1200×630)
 ├── favicon.svg           ← Icono de la pestaña del navegador
@@ -66,16 +81,21 @@ nuestro-amor/
 
 | Archivo | Qué contiene |
 |---|---|
-| `index.html` | `<head>` (metas iOS, Open Graph, iconos), todas las `<section>` dentro de `#app`, lightbox y sheet |
+| `index.html` | `<head>` (metas iOS, Open Graph, manifest, iconos), las 5 pestañas (panel Inicio + estados vacíos), presencia, gate de acceso, tab bar, flor, lightbox y sheet |
 | `css/base.css` | Reset, `:root` (tokens de color), botones `.btn`/`.btn-small`/`:disabled`, partículas `.pop`, footer, `prefers-reduced-motion` |
 | `css/ui.css` | Bottom sheet iOS (backdrop, sheet, grabber, título) y lightbox de foto |
 | `css/home.css` | Hero, caja de música, foto, jardín, "cosas de nosotros", "tu turno" |
+| `css/portal.css` | Tab bar iOS, pantalla de acceso (gate), tarjeta de presencia, estados vacíos, flor "pensando en ti" |
 | `js/audio.js` | `ensureAudio()`, `bell()`, `sndUnlock/sndMelody/sndFlip/sndChime/sndPop` — sin mp3 |
 | `js/ui.js` | Guiño de consola, título de pestaña, `haptic()`, `openSheet/closeSheet`, `burst()`, `dropPetal()` |
-| `js/home.js` | Arrays `messages`/`funCards`/`funExtras`, `buildGarden()`, caja, foto, "tu turno" (`REPLY_KEY`) y el bloque `Init` |
+| `js/home.js` | Arrays `messages`/`funCards`/`funExtras`, `buildGarden()`, caja, foto, "tu turno" (`replyKey()` por perfil) y el bloque `Init` |
+| `js/portal.js` | Sesión/`localStorage`, gate, pestañas, latido de presencia (~15 s), relojes (`America/Mexico_City`), flor, `register('sw.js')` |
+| `netlify/functions/api.mjs` | `?action=auth` (código → token HMAC por perfil, throttle por IP) y `?action=presence` (latido + thinking en Blobs) |
+| `manifest.json` | Nombre de app "Nosotros 💕", standalone, iconos 192/512 |
+| `sw.js` | Network-first con caché de respaldo: online fresco, offline lo último guardado; `/api` queda fuera |
 
 > Busca con Ctrl+F: los IDs (`#waxSeal`, `#replyInput`…) no cambian.
-> **Orden de carga:** `audio.js` → `ui.js` → `home.js`. No repitas `const`/`let` en dos archivos (colisionan en el scope global).
+> **Orden de carga:** `audio.js` → `ui.js` → `home.js` → `portal.js`. No repitas `const`/`let` en dos archivos (colisionan en el scope global).
 
 ---
 
@@ -108,11 +128,30 @@ Cuando mandes el link por WhatsApp, el preview usa `<head>`:
 
 ### Cambiar la sección "Tu turno"
 
-Busca `REPLY_KEY = 'kitzya-reply-v1'` en `js/home.js`.
-- Guarda lo que ella escriba en `localStorage` (solo en su teléfono, no sale del dispositivo).
+Busca `replyKey()` en `js/home.js`.
+- Cada perfil guarda lo suyo por separado (`daniel-reply-v1` / `kitzya-reply-v1`) en `localStorage` (solo en ese teléfono, no sale del dispositivo).
 - Al volver, aparece *"La última vez me escribiste…"* con un botón ✕ para borrar.
 - El botón "Enviármelo 💌" abre la hoja nativa de iOS (`navigator.share`) para elegir WhatsApp; si falla, copia al portapapeles.
 - **Tu número de teléfono nunca queda escrito en el código** (la web es pública).
+
+### Cambiar el código de acceso
+
+El código de 6 dígitos **no está en el repo**: vive en Netlify como env var.
+
+```powershell
+netlify env:set ACCESS_CODE "nuevo-código-de-6-dígitos"
+netlify deploy --prod --dir=.
+```
+
+Al cambiarlo, ambos deben entrar otra vez (los tokens viejos dejan de valer).
+
+### Añadir una pestaña nueva (siguientes fases)
+
+1. Crea el panel en `index.html`: `<div class="tab-panel" id="panel-NOMBRE" role="tabpanel" hidden>…</div>` (fuera de `#panel-inicio`, dentro de `#app`).
+2. Añade su botón en `<nav class="tabbar">` con `data-tab="NOMBRE"` y `aria-controls="panel-NOMBRE"` (icono SVG dibujado, no emoji).
+3. Estilos en `css/portal.css` (usa los patrones existentes: `.ios-card`/`.group-header` de `home.css`).
+4. Lógica en `js/portal.js` (o un `js/NOMBRE.js` cargado después, sin repetir `const`/`let`).
+5. Si consume la API, añade un `action` en `netlify/functions/api.mjs`.
 
 
 ### Cambiar colores
@@ -172,7 +211,7 @@ O si ya está conectado Netlify con GitHub, solo hacer `git push origin master` 
 
 ## 📜 Reglas de oro (para no repetir el desastre)
 
-1. **Sin build, sin framework, sin npm.** Archivos planos `index.html` + `css/` + `js/` con `<link>`/`<script defer>` (nada de ES modules: se sigue abriendo con doble clic). Si algún día se quiere React/Vite, hacerlo en una rama aparte y con build verificado.
+1. **Sin build, sin framework, sin npm en el front.** Archivos planos `index.html` + `css/` + `js/` con `<link>`/`<script defer>` (nada de ES modules: se sigue abriendo con doble clic). El único `package.json` es el de la function `/api` (back, para `@netlify/blobs`); no hay build en ningún lado. Si algún día se quiere React/Vite, hacerlo en una rama aparte y con build verificado.
 2. **Nunca callbacks de ref inline ni bucles de re-render.** Eso fue la causa del `TypeError: b is not a function` y el bucle infinito que rompió la versión React.
 3. **Probar local antes de desplegar.** Abrir `index.html` directo o `npx serve` en la carpeta.
 4. **Un cambio = un commit con mensaje claro.** Ejemplos: `❤️ Cambiar nombre`, `📸 Nueva foto`, `💬 Nuevo mensaje`.
@@ -188,7 +227,7 @@ O si ya está conectado Netlify con GitHub, solo hacer `git push origin master` 
 - [ ] Contador de días juntos
 - [ ] Mapa de lugares donde han estado
 - [ ] Comando secreto (Konami code)
-- [ ] PWA instalable en iPhone
+- [x] PWA instalable en iPhone (Fase 1: manifest + SW, app "Nosotros 💕")
 
 ---
 
@@ -210,6 +249,8 @@ O si ya está conectado Netlify con GitHub, solo hacer `git push origin master` 
 | `297d647` | 09-11-2026 | Preview de WhatsApp (`og-image.jpg`, OG tags), `favicon.svg`, `apple-touch-icon.png`, sección "Tu turno" (localStorage + `navigator.share`), guiño dev en consola y título de pestaña | Primera impresión al mandar el link + que ella pueda responder |
 
 | **Fase 0** | 10-11-2026 | Sitio separado en `css/` (base, ui, home) y `js/` (audio, ui, home) sin build; toast de "Tu turno" honesto (ya no promete WhatsApp); botón enviar nace disabled con estilo propio `.btn-small` de 44px; PNG suelta movida a `imagenes/`; `.netlify/` fuera de git | Limpieza de base antes del portal con pestañas (Fase 1) |
+
+| **Fase 1** | 10-11-2026 | `PRODUCT.md` (init impeccable); tab bar de 5 pestañas (iconos SVG) con estados vacíos; pantalla de acceso por código de 6 dígitos (dos perfiles, token HMAC, throttle por IP en `netlify/functions/api.mjs` + Blobs); presencia con latido ~15 s, relojes de ambos y flor "pensando en ti"; PWA (manifest "Nosotros 💕", SW offline, iconos 192/512); "Tu turno" por perfil; detector impeccable `[]`; API 18/18 en prod | El portal pasa de carta única a casa privada de dos personas |
 
 ---
 
