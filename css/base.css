@@ -1,0 +1,147 @@
+/* ══════════════════════════════════════════
+   BASE · reset, tokens y primitivas globales
+   iOS-NATIVE DESIGN SYSTEM · iPhone 14
+   Typography: SF Pro · Motion: iOS springs
+   ══════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+:root{
+  /* iOS system palette — coquette tint */
+  --ios-pink:#FF375F;          /* systemPink */
+  --ios-pink-soft:#FF6B8D;
+  --ios-rose:#E8A0BF;
+  --ios-blush:#F7C6CE;
+  --ios-pearl:#FDEEF4;
+  --ios-cream:#FFF8F0;
+  --ios-lilac:#E6D7F1;
+  --ios-mint:#C9E8D8;
+  --ios-deep:#8E4162;
+
+  --label:#000000;
+  --label-secondary:rgba(60,60,67,.6);
+  --label-tertiary:rgba(60,60,67,.3);
+  --separator:rgba(60,60,67,.18);
+
+  --fill-primary:rgba(120,120,128,.2);
+  --fill-secondary:rgba(120,120,128,.16);
+  --fill-tertiary:rgba(120,120,128,.12);
+
+  --bg-grouped:#F2F2F7;
+  --bg-elevated:rgba(255,255,255,.82);
+
+  /* iOS spring curves */
+  --spring:cubic-bezier(.175,.885,.32,1.12);
+  --spring-soft:cubic-bezier(.25,.1,.25,1);
+  --ios-ease:cubic-bezier(.32,.72,0,1);   /* sheet presentation */
+
+  --safe-top:env(safe-area-inset-top,20px);
+  --safe-bottom:env(safe-area-inset-bottom,20px);
+  --safe-left:env(safe-area-inset-left,0px);
+  --safe-right:env(safe-area-inset-right,0px);
+}
+
+html{
+  scroll-behavior:smooth;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',system-ui,sans-serif;
+  background:var(--bg-grouped);
+  color:var(--label);
+  min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  /* iOS rubber-band horizontal lock */
+  overscroll-behavior-x:none;
+}
+
+/* Handwriting solo para acentos decorativos (título) */
+.sf-hand{font-family:'Savoye LET','Snell Roundhand','Apple Chancery',cursive}
+
+/* ══ STATUS-BAR SPACER (safe area) ══ */
+.status-spacer{height:var(--safe-top);width:100%}
+
+/* ══ LARGE TITLE (estilo iOS Settings) ══ */
+.large-title{
+  padding:8px 20px 4px;
+  font-size:34px;line-height:41px;font-weight:700;letter-spacing:.37px;
+  color:var(--label);
+}
+.nav-subtitle{
+  padding:0 20px 14px;
+  font-size:15px;line-height:20px;
+  color:var(--label-secondary);
+}
+
+/* ══ CARD (elevated, estilo iOS In-App) ══ */
+.ios-card{
+  background:var(--bg-elevated);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-radius:22px;
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 8px 28px -8px rgba(0,0,0,.12), 0 0 0 .5px rgba(60,60,67,.08);
+  overflow:hidden;
+}
+
+/* ══ CONTAINER ══ */
+#app{
+  max-width:430px;margin:0 auto;
+  padding:0 16px calc(var(--safe-bottom) + 34px);
+}
+
+section{margin-bottom:28px}
+
+/* Group header estilo iOS */
+.group-header{
+  font-size:13px;line-height:18px;font-weight:400;
+  text-transform:uppercase;letter-spacing:.5px;
+  color:var(--label-secondary);
+  padding:0 16px 8px;
+}
+
+/* ══ BOTONES iOS ══ */
+.btn{
+  appearance:none;border:none;cursor:pointer;
+  min-height:50px;padding:0 30px;border-radius:14px;
+  font-family:inherit;font-size:17px;font-weight:600;letter-spacing:.1px;
+  color:#fff;
+  background:linear-gradient(180deg,#D62B54,#B71A48);
+  box-shadow:0 6px 16px -6px rgba(194,24,91,.5);
+  transition:transform .16s var(--spring),filter .16s;
+}
+.btn:active{transform:scale(.96);filter:brightness(.94)}
+.btn:focus-visible{outline:3px solid var(--ios-pink);outline-offset:3px}
+.btn-full{width:100%;max-width:270px}
+/* Estado disabled (botón enviar sin texto) */
+.btn:disabled{
+  background:#E5E5EA;color:#5F5F63;box-shadow:none;
+  cursor:default;transform:none;filter:none;
+}
+.btn:disabled:active{transform:none;filter:none}
+
+/* .btn-small — estilo PROPIO, no hereda .btn (min-height:50px) */
+.btn-small{
+  appearance:none;border:none;cursor:pointer;
+  min-width:44px;min-height:44px;                 /* objetivo táctil iOS */
+  padding:0;border-radius:50%;
+  background:var(--ios-pink);color:#fff;
+  font-family:inherit;font-size:17px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:transform .16s var(--spring),filter .16s;
+}
+.btn-small:active{transform:scale(.94);filter:brightness(.94)}
+.btn-small:focus-visible{outline:3px solid var(--ios-pink);outline-offset:3px}
+
+/* ══ PARTICULAS ══ */
+.pop{position:fixed;pointer-events:none;z-index:9999;font-size:20px;transition:all 1.3s var(--ios-ease)}
+
+footer{
+  text-align:center;padding:10px 20px calc(var(--safe-bottom) + 16px);
+  font-size:13px;color:var(--label-tertiary);
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}

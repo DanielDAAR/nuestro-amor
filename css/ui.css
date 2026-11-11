@@ -1,0 +1,49 @@
+/* ══════════════════════════════════════
+   UI · primitivas compartidas
+   (bottom sheet iOS + lightbox de foto)
+   ══════════════════════════════════════ */
+
+/* ══ SHEET estilo iOS (bottom sheet) ══ */
+.sheet-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;transition:opacity .35s var(--ios-ease);
+  z-index:100;backdrop-filter:blur(2px);
+}
+.sheet-backdrop.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:101;
+  background:#F2F2F7;
+  border-radius:14px 14px 0 0;
+  max-height:88dvh;overflow-y:auto;
+  transform:translateY(101%);
+  transition:transform .42s var(--ios-ease);
+  padding:10px 16px calc(var(--safe-bottom) + 20px);
+  box-shadow:0 -8px 40px rgba(0,0,0,.2);
+}
+.sheet.on{transform:translateY(0)}
+.sheet-grabber{width:36px;height:5px;border-radius:3px;background:rgba(60,60,67,.3);margin:6px auto 14px}
+.sheet-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
+.sheet-sub{font-size:15px;color:var(--label-secondary);text-align:center;margin-bottom:18px}
+
+/* ══ LIGHTBOX (foto a pantalla completa) ══ */
+.lightbox{
+  position:fixed;inset:0;z-index:120;background:rgba(0,0,0,.93);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s var(--ios-ease);
+  padding:calc(var(--safe-top) + 14px) 14px calc(var(--safe-bottom) + 14px);
+}
+.lightbox.on{opacity:1;pointer-events:auto}
+.lightbox img{
+  max-width:100%;max-height:100%;object-fit:contain;border-radius:14px;
+  transform:scale(.9);transition:transform .4s var(--spring);
+  box-shadow:0 24px 70px rgba(0,0,0,.55);
+}
+.lightbox.on img{transform:scale(1)}
+.lightbox-close{
+  position:absolute;top:calc(var(--safe-top) + 12px);right:16px;
+  width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,255,255,.2);color:#fff;font-size:19px;font-weight:600;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+}
+.lightbox-close:active{transform:scale(.9)}

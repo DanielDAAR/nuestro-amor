@@ -1,0 +1,213 @@
+/* ══════════════════════════════════════
+   HOME · pestaña "Inicio" (la carta)
+   hero · caja de música · foto · jardín ·
+   cosas de nosotros · tu turno
+   ══════════════════════════════════════ */
+
+/* ══════════════════════════════════════
+   HERO
+   ══════════════════════════════════════ */
+.hero{
+  padding:14px 4px 20px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.hero .eyebrow{
+  font-size:13px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;
+  color:#C2185B;
+  display:flex;align-items:center;gap:6px;
+}
+.hero h1{
+  font-family:'Savoye LET','Snell Roundhand','Apple Chancery',cursive;
+  font-size:44px;line-height:1.1;font-weight:400;
+  color:var(--ios-deep);
+  letter-spacing:.5px;
+}
+.hero .lede{font-size:17px;line-height:24px;color:var(--label-secondary)}
+
+/* ══════════════════════════════════════
+   CAJA DE MÚSICA — bloques limpios,
+   SIN sobreposiciones
+   ══════════════════════════════════════ */
+.box-area{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+
+/* 1 · Lazo (su propio bloque, encima) */
+.bow-slot{height:66px;display:flex;align-items:flex-end;justify-content:center}
+.deco-bow{width:72px;height:64px;transition:transform .5s var(--spring);filter:drop-shadow(0 4px 8px rgba(232,160,191,.35))}
+.deco-bow.opened{transform:rotate(-8deg) scale(.9)}
+
+/* 2 · Caja */
+.music-box{
+  width:100%;max-width:340px;
+  background:#fff;
+  border-radius:26px;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 12px 32px -12px rgba(0,0,0,.18);
+  padding:20px 18px 22px;
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+  transition:box-shadow .4s var(--spring-soft);
+}
+.music-box.opened{box-shadow:0 0 0 .5px rgba(255,55,95,.25), 0 16px 40px -14px rgba(255,55,95,.28)}
+
+/* 2a · Perlas (fila propia arriba) */
+.pearls{width:100%;height:16px;opacity:.75}
+
+/* 2b · Sello (fila propia con su hint) */
+.seal-row{display:flex;flex-direction:column;align-items:center;gap:8px}
+.wax-seal{
+  width:72px;height:72px;border-radius:50%;
+  background:radial-gradient(circle at 34% 32%,#FF6B8D,#8E4162 78%);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 16px -4px rgba(142,65,98,.55), inset 0 1.5px 3px rgba(255,255,255,.35);
+  transition:transform .18s var(--spring);
+  position:relative;
+}
+.wax-seal:active{transform:scale(.9);transition-duration:.09s}
+.wax-seal::after{
+  /* ring de foco iOS */
+  content:'';position:absolute;inset:-6px;border-radius:50%;
+  border:2.5px solid transparent;transition:border-color .2s;
+}
+.wax-seal:focus-visible::after{border-color:var(--ios-pink)}
+.wax-seal svg{width:38px;height:38px;pointer-events:none}
+.seal-hint{font-size:15px;color:var(--label-secondary);text-align:center}
+
+/* 2c · Interior (hermano de la caja, no anidado dentro) */
+.box-interior{width:100%;display:none;flex-direction:column;align-items:center;gap:14px}
+.box-area.opened .box-interior{display:flex;animation:iosIn .45s var(--ios-ease) both}
+@keyframes iosIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+
+/* ── Tarjeta flip ── */
+.flip-card{width:100%;max-width:270px;height:250px;perspective:1100px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .65s var(--spring);transform-style:preserve-3d}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:22px;text-align:center;
+}
+.flip-front{background:var(--ios-cream)}
+.flip-back{background:linear-gradient(180deg,#FFF0F4,#FFE6ED);transform:rotateY(180deg)}
+.flip-emoji{font-size:44px;margin-bottom:10px}
+.flip-title{font-size:20px;font-weight:700;letter-spacing:.2px;color:var(--label);margin-bottom:6px}
+.flip-back .flip-title{color:var(--ios-deep)}
+.flip-desc{font-size:15px;line-height:21px;color:rgba(60,60,67,.75)}
+
+/* ══════════════════════════════════════
+   NUESTRA FOTO
+   ══════════════════════════════════════ */
+.photo-card{
+  width:100%;background:#fff;border-radius:22px;
+  padding:10px 10px 16px;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.12), 0 12px 32px -12px rgba(0,0,0,.16);
+}
+.photo-frame{
+  display:block;width:100%;border:none;padding:0;margin:0;
+  background:#F2F2F7;border-radius:16px;overflow:hidden;cursor:pointer;
+}
+.photo-frame img{
+  width:100%;height:auto;display:block;border-radius:16px;
+  transition:transform .3s var(--spring);
+}
+.photo-frame:active img{transform:scale(.975)}
+.photo-frame:focus-visible{outline:3px solid var(--ios-pink);outline-offset:3px}
+.photo-caption{
+  font-family:'Savoye LET','Snell Roundhand','Apple Chancery',cursive;
+  font-size:26px;color:var(--ios-deep);text-align:center;
+  padding:16px 14px 2px;
+}
+.photo-meta{font-size:14px;color:var(--label-secondary);text-align:center;padding:0 14px}
+
+/* ══════════════════════════════════════
+   JARDÍN — flores que crecen desde abajo
+   ══════════════════════════════════════ */
+.garden{
+  position:relative;width:100%;height:190px;
+  border-radius:22px;overflow:hidden;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4FBF7 55%,#E7F6EE 100%);
+  box-shadow:0 0 0 .5px rgba(60,60,67,.1);
+}
+.garden-ground{position:absolute;bottom:0;left:0;width:100%;height:36px;background:linear-gradient(180deg,transparent,rgba(140,185,160,.35))}
+.flower{
+  position:absolute;bottom:0;transform-origin:bottom center;
+  transform:scaleY(0);
+  transition:transform .85s var(--spring);
+}
+.garden.grown .flower{transform:scaleY(1)}
+.flower svg{
+  display:block;transform-origin:bottom center;
+  animation:breeze 4.8s ease-in-out infinite;
+}
+.flower:nth-child(even) svg{animation-duration:6.2s;animation-delay:-2.4s}
+.flower:nth-child(3n) svg{animation-delay:-4s}
+@keyframes breeze{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+/* Reacción al pasar el dedo */
+.flower.sway svg{animation:swayF .8s cubic-bezier(.175,.885,.32,1.12)}
+@keyframes swayF{
+  0%{transform:rotate(0)}
+  18%{transform:rotate(-15deg)}
+  50%{transform:rotate(12deg)}
+  76%{transform:rotate(-6deg)}
+  100%{transform:rotate(0)}
+}
+/* Pétalo suelto */
+.petal{
+  position:fixed;pointer-events:none;z-index:9998;
+  font-size:18px;opacity:.95;
+  transition:transform 1.5s ease-in, opacity 1.5s ease-in;
+}
+
+/* ══════════════════════════════════════
+   SECCIÓN DIVERTIDA — lista estilo iOS
+   ══════════════════════════════════════ */
+.fun-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fun-card{
+  background:#fff;border-radius:18px;padding:18px 12px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;min-height:126px;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.1);
+  transition:transform .18s var(--spring);
+}
+.fun-card:active{transform:scale(.95);transition-duration:.1s}
+.fun-card:focus-visible{outline:3px solid var(--ios-pink);outline-offset:2px}
+.fun-emoji{font-size:34px}
+.fun-label{font-size:14px;font-weight:600;line-height:19px;color:var(--label)}
+.fun-card.wide{
+  grid-column:1 / -1;min-height:96px;
+  background:linear-gradient(135deg,#FFF0F4,#FFE6ED);
+}
+.fun-card.wide .fun-label{color:var(--ios-deep)}
+
+/* ═════════════════════════════════════════════
+   TU TURNO — ella puede responder
+   ═════════════════════════════════════════════ */
+.reply-card{
+  background:#fff;border-radius:20px;padding:20px 18px 24px;
+  box-shadow:0 0 0 .5px rgba(60,60,67,.1);
+  margin-bottom:14px;
+}
+.reply-last{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:#FDEEF4;border-radius:14px;padding:12px 14px;
+  margin-bottom:14px;
+}
+.reply-last-label{font-size:12px;font-weight:600;color:var(--ios-deep);letter-spacing:.5px}
+.reply-last-text{font-size:16px;color:var(--label);overflow-wrap:anywhere}
+.reply-label{display:block;font-size:13px;font-weight:600;color:var(--label-secondary);margin-bottom:8px}
+#replyInput{
+  width:100%;font-size:17px;font-family:inherit;line-height:1.5;
+  border:none;border-radius:12px;background:#F2F2F7;padding:14px 16px;
+  resize:none;outline:none;min-height:96px;color:var(--label);
+  box-shadow:inset 0 0 0 1px rgba(60,60,67,.08);
+}
+#replyInput::placeholder{color:rgba(60,60,67,.35)}
+#replyInput:focus{box-shadow:0 0 0 3px rgba(255,55,95,.18)}
+.reply-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px}
+.reply-count{font-size:12px;color:var(--label-tertiary)}
+.reply-toast{font-size:13px;color:var(--ios-deep);margin-top:10px}
+@media (max-width:429px){
+  .reply-card{padding-bottom:calc(var(--safe-bottom) + 20px)}
+}
+@media (max-width:380px){
+  .fun-grid{grid-template-columns:1fr}
+  .fun-card.wide{grid-column:auto}
+}
