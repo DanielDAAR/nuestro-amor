@@ -247,7 +247,11 @@
 
     if (btn) { btn.disabled = false; btn.textContent = label; }
     listSkeleton(false);
-    if (!res.ok) { showMsg($('#watchMsg'), errorText(res)); return; }
+    if (!res.ok) {
+      console.error('ERROR guardando película:', res);
+      showMsg($('#watchMsg'), errorText(res));
+      return;
+    }
     if ($('#watchTitle')) $('#watchTitle').value = '';
     showMsg($('#watchMsg'), '');
     showMsg($('#watchMsg'), 'Guardado');
@@ -257,8 +261,19 @@
 
   /* ── enlaces de interfaz ── */
   function wire() {
+    const form = $('#watchForm');
+    if (form) {
+      form.addEventListener('submit', submitWatch);
+    }
+
     const btn = $('#watchSubmit');
-    if (btn) btn.addEventListener('click', submitWatch);
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        submitWatch();
+      });
+    }
 
     const list = $('#watchList');
     if (list) {
