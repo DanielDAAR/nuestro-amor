@@ -232,8 +232,11 @@
   /* ── escritura ── */
   async function submitWatch(e) {
     e.preventDefault();
+    e.stopPropagation();
+
     const title = ($('#watchTitle') ? $('#watchTitle').value : '').trim();
     if (!title) { showMsg($('#watchMsg'), 'Escribe un título.'); return; }
+
     const btn = $('#watchSubmit');
     const label = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
@@ -243,7 +246,8 @@
     const res = await PortalAPI('watch', { method: 'POST', body: { title: title } });
 
     if (btn) { btn.disabled = false; btn.textContent = label; }
-    if (!res.ok) { listSkeleton(false); showMsg($('#watchMsg'), errorText(res)); return; }
+    listSkeleton(false);
+    if (!res.ok) { showMsg($('#watchMsg'), errorText(res)); return; }
     if ($('#watchTitle')) $('#watchTitle').value = '';
     showMsg($('#watchMsg'), '');
     showMsg($('#watchMsg'), 'Guardado');
@@ -254,7 +258,9 @@
   /* ── enlaces de interfaz ── */
   function wire() {
     const form = $('#watchForm');
-    if (form) form.addEventListener('submit', submitWatch);
+    if (form) {
+      form.addEventListener('submit', submitWatch);
+    }
 
     const list = $('#watchList');
     if (list) {
