@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
    GARDEN · jardín compartido, logros y reto de la semana (pestaña Jardín)
-   Reutiliza flowerSVG() (global, de home.js) y .garden/.flower/.grown (home.css).
    IIFE: no declara nada en el scope global.
    ════════════════════════════════════════════════════════════ */
 (function () {
@@ -13,7 +12,7 @@
   const mod = {
     ready: false,
     fetching: false,
-    data: { owners: [], achievements: [], counts: {}, me: 'kitzya' },
+    data: null,
     me: 'kitzya',
     heartbeatCount: 0,
   };
@@ -88,12 +87,18 @@
         setNetwork(false);
         const cached = PortalCache.get(CACHE_KEY);
         if (cached && Array.isArray(cached.owners)) mod.data = cached;
+        else if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
+      } else {
+        if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
       }
       renderGarden();
       renderAchievements();
       await loadChallenge();
     } catch (e) {
       console.error('[GARDEN] Error en load():', e);
+      if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
+      renderGarden();
+      renderAchievements();
     } finally {
       mod.fetching = false;
     }
@@ -110,27 +115,29 @@
     const flowers = Math.floor(owners.length / 3);
 
     ground.textContent = '';
-    const visible = owners.slice(0, 60 * 3);
+
+    if (!owners.length) {
+      const empty = el('p', 'garden-empty', 'Aún no hay flores. Escribe cartas, juega, dedica canciones...');
+      ground.appendChild(empty);
+      countEl.textContent = '0 flores · 0 puntos';
+      return;
+    }
+
+    visible = owners.slice(0, 60 * 3);
     visible.forEach((owner, i) => {
-      const colors = FLOWER_COLORS[i % FLOWER_COLORS.length];
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('viewBox', '0 0 120 120');
-      svg.setAttribute('class', 'flower');
-      svg.setAttribute('aria-label', 'Flor de ' + (NAMES[owner] || owner));
-      svg.innerHTML =
-        '<g fill="' + colors[0] + '">' +
-        '<ellipse cx="60" cy="36" rx="14" ry="20"/>' +
-        '<ellipse cx="60" cy="36" rx="14" ry="20" transform="rotate(72 60 60)"/>' +
-        '<ellipse cx="60" cy="36" rx="14" ry="20" transform="rotate(144 60 60)"/>' +
-        '<ellipse cx="60" cy="36" rx="14" ry="20" transform="rotate(216 60 60)"/>' +
-        '<ellipse cx="60" cy="36" rx="14" ry="20" transform="rotate(288 60 60)"/>' +
-        '</g>' +
-        '<circle cx="60" cy="60" r="14" fill="' + colors[1] + '"/>' +
-        '<circle cx="60" cy="60" r="6.5" fill="#FFF3B0"/>';
-      ground.appendChild(svg);
+      const color = FLOWER_COLORS[i % FLOWER_COLORS.length];
+      const flower = document.createElement('div');
+      flower.className = 'flower';
+      flower.style.background = 'linear-gradient(180deg, ' + colors[0] + ', ' + colors[1] + ')';
+      flower.style.borderRadius = '50%';
+      flower.style.width = '46px';
+      flower.style.height = '46px';
+      flower.style.margin = '4px';
+      flower.style.boxShadow = '0 2px 8px rgba(0,0,0,.2)';
+      flower.setAttribute('title', 'Flor de ' + (NAMES[owner] || owner));
+      ground.appendChild(flower);
     });
 
-    // Quitar "y N más" anteriores antes de agregar uno nuevo
     document.querySelectorAll('.garden-extra').forEach((n) => n.remove());
     if (owners.length > 180) {
       const resto = Math.floor((owners.length - 180) / 3);
