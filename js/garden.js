@@ -262,7 +262,6 @@
     showMsg($('#challengeMsg'), '');
     showMsg($('challengeMsg'), 'Guardado');
     setTimeout(() => { showMsg($('challengeMsg'), ''); }, 1500);
-    await loadChallenge();
     await load();
   }
 
@@ -287,7 +286,6 @@
     setTimeout(() => { showMsg($('challengeMsg'), ''); }, 1500);
     if (photoInput) photoInput.value = '';
     if (noteInput) noteInput.value = '';
-    await loadChallenge();
     await load();
   }
 
