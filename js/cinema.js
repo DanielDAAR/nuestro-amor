@@ -276,6 +276,7 @@
     showMsg($('#watchMsg'), 'Guardado');
     setTimeout(() => { showMsg($('#watchMsg'), ''); }, 1500);
     await load();
+    PortalBus.emit('portal:garden-update');
   }
 
   /* ── enlaces de interfaz ── */

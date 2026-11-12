@@ -411,6 +411,12 @@
     if (mod.heartbeatCount % 4 === 0) load();
   });
 
+  // Cuando cualquiera guarda algo (carta, canción, película, juego, foto, diario, reto),
+  // actualizar el jardín inmediatamente
+  PortalBus.on('portal:garden-update', () => {
+    if (mod.ready) load();
+  });
+
   addEventListener('offline', () => setNetwork(false));
   addEventListener('online', () => setNetwork(true));
 

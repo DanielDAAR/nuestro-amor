@@ -619,6 +619,7 @@
         if (empty) empty.remove();
       }
       saveCache();
+      PortalBus.emit('portal:garden-update');
     }
     return;
   }
@@ -849,6 +850,7 @@
     }
 
     await load();
+    PortalBus.emit('portal:garden-update');
   }
 
   /* ── escritura ── */
@@ -903,6 +905,7 @@
 
     showMsg($('memoriesMsg'), 'Guardado');
     setTimeout(() => { showMsg($('memoriesMsg'), ''); }, 1500);
+    PortalBus.emit('portal:garden-update');
   }
 
   async function submitCapsuleDate(e) {
@@ -931,6 +934,7 @@
     showMsg($('memoriesMsg'), 'Guardado');
     setTimeout(() => { showMsg($('memoriesMsg'), ''); }, 1500);
     await load();
+    PortalBus.emit('portal:garden-update');
   }
 
   async function submitCapsuleEntry(e) {
@@ -958,6 +962,7 @@
     showMsg($('memoriesMsg'), 'Guardado');
     setTimeout(() => { showMsg($('memoriesMsg'), ''); }, 1500);
     await load();
+    PortalBus.emit('portal:garden-update');
   }
 
   async function deleteLetter(id) {

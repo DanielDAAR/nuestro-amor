@@ -450,6 +450,7 @@
     showMsg($('musicMsg'), 'Guardado');
     setTimeout(() => { showMsg($('musicMsg'), ''); }, 1500);
     await load();
+    PortalBus.emit('portal:garden-update');
   }
 
   async function setNow(id) {

@@ -753,6 +753,7 @@
         if (btn) { btn.disabled = !mod.writable; btn.textContent = label; }
         render();
         sfx('sndPop');
+        PortalBus.emit('portal:garden-update');
         return;
       }
 
@@ -790,6 +791,7 @@
         gameMsg('');
         mod.busy = false;
         render();
+        PortalBus.emit('portal:garden-update');
         return;
       }
 
