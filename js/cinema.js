@@ -257,10 +257,8 @@
 
   /* ── enlaces de interfaz ── */
   function wire() {
-    const form = $('#watchForm');
-    if (form) {
-      form.addEventListener('submit', submitWatch);
-    }
+    const btn = $('#watchSubmit');
+    if (btn) btn.addEventListener('click', submitWatch);
 
     const list = $('#watchList');
     if (list) {
