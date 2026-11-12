@@ -1,9 +1,10 @@
-/* ════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════════════════════
    GARDEN · pestaña "Jardín"
    (reutiliza .ios-card, .group-header, .stack, .field-label,
-   .input, .form-actions, .form-msg de css/portal.css y css/base.css)
-   ════════════════════════════════════════════════════════════ */
- 
+   .input, .form-actions, .form-msg de css/portal.css y css/base.css,
+   y .garden/.flower/.grown de css/home.css)
+   ═════════════════════════════════════════════════════════════════════════════════════ */
+
  /* ── jardín compartido ── */
  .garden-shared{
    position:relative;
@@ -15,9 +16,11 @@
  }
  .flower{
    width:46px;height:46px;flex:none;
-   border-radius:50%;
-   box-shadow:0 2px 8px rgba(0,0,0,.2);
+   transform:scale(.6) translateY(10px);opacity:0;
+   transition:transform .5s var(--spring), opacity .4s var(--spring-soft);
+   filter:drop-shadow(0 4px 8px rgba(0,0,0,.12));
  }
+ .flower.grown{transform:none;opacity:1}
  .garden-extra{
    font-size:13px;line-height:18px;color:var(--label-secondary);
    margin-top:8px;
