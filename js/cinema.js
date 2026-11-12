@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════
    CINEMA · películas por ver, calificación y ruleta (pestaña Música y cine)
    IIFE: no declara nada en el scope global.
-   ═══════════════════════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
@@ -76,6 +76,8 @@
         setNetwork(false);
         const cached = PortalCache.get(CACHE_KEY);
         if (Array.isArray(cached)) mod.items = cached;
+      } else {
+        mod.items = [];
       }
       renderList();
       renderRoulette();
@@ -91,6 +93,11 @@
     if (!list) return;
     list.textContent = '';
 
+    if (!mod.items.length) {
+      list.appendChild(el('p', 'watch-empty',
+        'Todavía no hay películas. Añade la primera de abajo.'));
+      return;
+    }
     mod.items.forEach((item) => list.appendChild(watchItem(item)));
   }
 
@@ -199,7 +206,6 @@
     }
     $('#btnRoulette').disabled = false;
     if (last && target.id === last.id) {
-      // ya salió esta semana, no repetir hasta que haya otra
       res.textContent = 'Ya salió esta semana: "' + target.title + '".';
       return;
     }
@@ -237,8 +243,7 @@
     const res = await PortalAPI('watch', { method: 'POST', body: { title: title } });
 
     if (btn) { btn.disabled = false; btn.textContent = label; }
-    listSkeleton(false);
-    if (!res.ok) { showMsg($('#watchMsg'), errorText(res)); return; }
+    if (!res.ok) { listSkeleton(false); showMsg($('#watchMsg'), errorText(res)); return; }
     if ($('#watchTitle')) $('#watchTitle').value = '';
     showMsg($('#watchMsg'), '');
     showMsg($('#watchMsg'), 'Guardado');

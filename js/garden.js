@@ -2,7 +2,7 @@
    GARDEN · jardín compartido, logros y reto de la semana (pestaña Jardín)
    Reutiliza flowerSVG() (global, de home.js) y .garden/.flower/.grown (home.css).
    IIFE: no declara nada en el scope global.
-   ═══════════════════════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
@@ -78,7 +78,7 @@
     mod.fetching = true;
     try {
       const res = await PortalAPI('garden');
-      if (res.ok && res.data) {
+      if (res.ok && res.data && Array.isArray(res.data.owners)) {
         mod.data = res.data;
         mod.data.me = mod.me;
         setNetwork(true);
@@ -86,10 +86,10 @@
       } else if (res.status === 0) {
         setNetwork(false);
         const cached = PortalCache.get(CACHE_KEY);
-        if (cached) mod.data = cached;
+        if (cached && Array.isArray(cached.owners)) mod.data = cached;
+        else if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
       } else {
-        // Siempre tener datos por defecto para no dejar en blanco
-        if (!mod.data) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
+        if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
       }
       renderGarden();
       renderAchievements();
@@ -110,7 +110,7 @@
     const flowers = Math.floor(owners.length / 3);
 
     ground.textContent = '';
-    const visible = owners.slice(0, 60 * 3); // 60 flores = 180 owners
+    const visible = owners.slice(0, 60 * 3);
     visible.forEach((owner, i) => {
       const colors = FLOWER_COLORS[i % FLOWER_COLORS.length];
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -128,10 +128,6 @@
         '<circle cx="60" cy="60" r="14" fill="' + colors[1] + '"/>' +
         '<circle cx="60" cy="60" r="6.5" fill="#FFF3B0"/>';
       ground.appendChild(svg);
-    });
-    // animación de crecimiento tras pintar
-    requestAnimationFrame(() => {
-      ground.querySelectorAll('.flower').forEach((f) => f.classList.add('grown'));
     });
 
     if (owners.length > 180) {
@@ -320,7 +316,6 @@
     }
   }
 
-  /* Compresión: lado mayor a 1600 px, calidades 0.82 → 0.7 → 0.6, máx 1,5 MB */
   function compressImage(file) {
     return new Promise((resolve, reject) => {
       if (!file.type.match(/^image\/(jpeg|png)$/)) {
@@ -336,6 +331,7 @@
         else if (h > maxSide) { w = Math.round(w * (maxSide / h)); h = maxSide; }
         canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('canvas')); return; }
         ctx.drawImage(img, 0, 0, w, h);
         const tryQuality = (q) => {
           const mime = file.type === 'image/png' ? 'image/jpeg' : file.type;
@@ -360,7 +356,6 @@
     const form = $('#challengePromptForm');
     if (form) form.addEventListener('submit', submitPrompt);
 
-    const answerForm = document.getElementById('challengeAnswerForm') || null;
     const answerSubmit = $('#challengeAnswerSubmit');
     if (answerSubmit) {
       answerSubmit.addEventListener('click', submitAnswer);
@@ -401,7 +396,7 @@
   PortalBus.on('portal:heartbeat', () => {
     if (!mod.ready || !isActive()) return;
     mod.heartbeatCount = (mod.heartbeatCount || 0) + 1;
-    if (mod.heartbeatCount % 4 === 0) load(); // cada 4.º latido (~60 s)
+    if (mod.heartbeatCount % 4 === 0) load();
   });
 
   addEventListener('offline', () => setNetwork(false));
