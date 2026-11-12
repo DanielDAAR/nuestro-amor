@@ -28,7 +28,10 @@
   ];
 
   /* ── utilidades ── */
-  function $(id) { return document.getElementById(id); }
+  function $(id) {
+    // quita el '#' si lo trae, para soportar $('#id') y $('#id')
+    return document.getElementById(String(id).replace(/^#/, ''));
+  }
 
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -78,6 +81,7 @@
     mod.fetching = true;
     try {
       const res = await PortalAPI('garden');
+      console.log('[GARDEN] GET garden respuesta:', res.status, res.data ? Object.keys(res.data) : null);
       if (res.ok && res.data && Array.isArray(res.data.owners)) {
         mod.data = res.data;
         mod.data.me = mod.me;
@@ -94,6 +98,11 @@
       renderGarden();
       renderAchievements();
       await loadChallenge();
+    } catch (e) {
+      console.error('[GARDEN] Error en load():', e);
+      if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
+      renderGarden();
+      renderAchievements();
     } finally {
       mod.fetching = false;
     }
@@ -110,7 +119,7 @@
     const flowers = Math.floor(owners.length / 3);
 
     ground.textContent = '';
-    const visible = owners.slice(0, 60 * 3);
+    const visible = owners.slice(0, 60 * 3); // 60 flores = 180 owners
     visible.forEach((owner, i) => {
       const colors = FLOWER_COLORS[i % FLOWER_COLORS.length];
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -401,4 +410,7 @@
 
   addEventListener('offline', () => setNetwork(false));
   addEventListener('online', () => setNetwork(true));
+
+  /* Exponer para usar desde el HTML si es necesario */
+  window.submitWatch = submitWatch;
 })();
