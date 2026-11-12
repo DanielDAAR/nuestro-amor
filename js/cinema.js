@@ -68,6 +68,7 @@
     listSkeleton(true);
     try {
       const res = await PortalAPI('watch');
+      console.log('[CINEMA] GET watch respuesta:', res.status, res.data ? Object.keys(res.data) : null);
       if (res.ok && res.data && Array.isArray(res.data.items)) {
         mod.items = res.data.items;
         setNetwork(true);
@@ -79,6 +80,11 @@
       } else {
         mod.items = [];
       }
+      renderList();
+      renderRoulette();
+    } catch (e) {
+      console.error('[CINEMA] Error en load():', e);
+      mod.items = [];
       renderList();
       renderRoulette();
     } finally {
@@ -234,7 +240,10 @@
     e.preventDefault();
     e.stopPropagation();
 
+    console.log('[CINEMA] submitWatch iniciado');
+
     const title = ($('#watchTitle') ? $('#watchTitle').value : '').trim();
+    console.log('[CINEMA] Título ingresado:', '"' + title + '"');
     if (!title) { showMsg($('#watchMsg'), 'Escribe un título.'); return; }
 
     const btn = $('#watchSubmit');
@@ -243,12 +252,16 @@
     showMsg($('#watchMsg'), '');
     listSkeleton(true);
 
+    console.log('[CINEMA] Enviando a API:', { title: title });
+
     const res = await PortalAPI('watch', { method: 'POST', body: { title: title } });
+
+    console.log('[CINEMA] Respuesta API:', res.status, res.data ? res.data : res.error);
 
     if (btn) { btn.disabled = false; btn.textContent = label; }
     listSkeleton(false);
     if (!res.ok) {
-      console.error('ERROR guardando película:', res);
+      console.error('[CINEMA] Error guardando:', res);
       showMsg($('#watchMsg'), errorText(res));
       return;
     }
