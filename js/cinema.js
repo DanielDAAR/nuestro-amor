@@ -236,8 +236,6 @@
   }
 
   /* ── escritura ── */
-  let watchTitleValue = '';
-
   async function submitWatch(e) {
     if (e) {
       e.preventDefault();
@@ -246,7 +244,8 @@
 
     console.log('[CINEMA] submitWatch iniciado');
 
-    const title = watchTitleValue.trim();
+    const watchTitleInput = $('#watchTitle');
+    const title = (watchTitleInput ? watchTitleInput.value : '').trim();
     console.log('[CINEMA] Título ingresado:', '"' + title + '"');
     if (!title) { showMsg($('#watchMsg'), 'Escribe un título.'); return; }
 
