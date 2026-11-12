@@ -19,7 +19,10 @@
   const starIcons = ['☆', '☆', '☆', '☆', '☆'];
 
   /* ── utilidades ── */
-  function $(id) { return document.getElementById(id); }
+  function $(id) {
+    // quita el '#' si lo trae, para soportar $('#watchTitle') y $('#watchTitle')
+    return document.getElementById(String(id).replace(/^#/, ''));
+  }
 
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -244,7 +247,7 @@
 
     console.log('[CINEMA] submitWatch iniciado');
 
-    const watchTitleInput = $('#watchTitle');
+    const watchTitleInput = document.getElementById('watchTitle');
     const title = (watchTitleInput ? watchTitleInput.value : '').trim();
     console.log('[CINEMA] Título ingresado:', '"' + title + '"');
     if (!title) { showMsg($('#watchMsg'), 'Escribe un título.'); return; }
@@ -269,7 +272,6 @@
       return;
     }
     $('#watchTitle').value = '';
-    watchTitleValue = '';
     showMsg($('#watchMsg'), '');
     showMsg($('#watchMsg'), 'Guardado');
     setTimeout(() => { showMsg($('#watchMsg'), ''); }, 1500);
@@ -289,13 +291,6 @@
         e.preventDefault();
         e.stopPropagation();
         submitWatch(e);
-      });
-    }
-
-    const watchTitleInput = $('#watchTitle');
-    if (watchTitleInput) {
-      watchTitleInput.addEventListener('input', (e) => {
-        watchTitleValue = e.target.value.trim();
       });
     }
 
