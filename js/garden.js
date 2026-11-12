@@ -87,10 +87,13 @@
         setNetwork(false);
         const cached = PortalCache.get(CACHE_KEY);
         if (cached) mod.data = cached;
+      } else {
+        // Siempre tener datos por defecto para no dejar en blanco
+        if (!mod.data) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
       }
       renderGarden();
       renderAchievements();
-      loadChallenge();
+      await loadChallenge();
     } finally {
       mod.fetching = false;
     }

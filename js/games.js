@@ -244,7 +244,7 @@
       if (mod.ready && !mod.fetching && isActive() && mod.game && mod.game.status === 'open') {
         load();
       }
-    }, 3000); // cada 3 s mientras haya partida abierta
+    }, 1000); // cada 1 s mientras haya partida abierta
   }
   function stopGamePoll() {
     if (mod.gamePollTimer) { clearInterval(mod.gamePollTimer); mod.gamePollTimer = null; }
