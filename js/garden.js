@@ -28,10 +28,7 @@
   ];
 
   /* ── utilidades ── */
-  function $(id) {
-    // quita el '#' si lo trae, para soportar $('#id') y $('#id')
-    return document.getElementById(String(id).replace(/^#/, ''));
-  }
+  function $(id) { return document.getElementById(String(id).replace(/^#/, '')); }
 
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -41,7 +38,7 @@
   }
 
   function isActive() {
-    const panel = $(PANEL_ID);
+    const panel = document.getElementById(PANEL_ID);
     return !!panel && !panel.hidden;
   }
   function showMsg(node, text) {
@@ -79,9 +76,10 @@
   async function load() {
     if (!mod.ready || mod.fetching) return;
     mod.fetching = true;
+    console.log('[GARDEN] Cargando jardín...');
     try {
       const res = await PortalAPI('garden');
-      console.log('[GARDEN] GET garden respuesta:', res.status, res.data ? Object.keys(res.data) : null);
+      console.log('[GARDEN] Respuesta API:', res.status, res.data ? res.data.owners ? res.data.owners.length : 0 : 'sin datos');
       if (res.ok && res.data && Array.isArray(res.data.owners)) {
         mod.data = res.data;
         mod.data.me = mod.me;
@@ -90,8 +88,12 @@
       } else if (res.status === 0) {
         setNetwork(false);
         const cached = PortalCache.get(CACHE_KEY);
-        if (cached && Array.isArray(cached.owners)) mod.data = cached;
-        else if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
+        if (cached && Array.isArray(cached.owners)) {
+          mod.data = cached;
+          console.log('[GARDEN] Usando caché:', cached.owners.length, 'flores');
+        } else if (!mod.data || !Array.isArray(mod.data.owners)) {
+          mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
+        }
       } else {
         if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
       }
@@ -111,15 +113,20 @@
   /* ── jardín ── */
   function renderGarden() {
     const ground = document.getElementById('gardenShared');
-    const countEl = $('#gardenCount');
-    if (!ground || !countEl) return;
+    const countEl = document.getElementById('gardenCount');
+    if (!ground || !countEl) {
+      console.error('[GARDEN] No se encontró #gardenShared o #gardenCount en el DOM');
+      return;
+    }
 
     const data = mod.data;
     const owners = data && Array.isArray(data.owners) ? data.owners : [];
     const flowers = Math.floor(owners.length / 3);
 
+    console.log('[GARDEN] Renderizando jardín con', owners.length, 'dueños,', flowers, 'flores');
+
     ground.textContent = '';
-    const visible = owners.slice(0, 60 * 3); // 60 flores = 180 owners
+    const visible = owners.slice(0, 60 * 3);
     visible.forEach((owner, i) => {
       const colors = FLOWER_COLORS[i % FLOWER_COLORS.length];
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -185,7 +192,10 @@
     const noteInput = $('#challengeNote');
     const answerSubmit = $('#challengeAnswerSubmit');
     const msg = $('#challengeMsg');
-    if (!card || !promptEl || !form || !input || !submit || !answerBox || !photoInput || !noteInput || !answerSubmit || !msg) return;
+    if (!card || !promptEl || !form || !input || !submit || !answerBox || !photoInput || !noteInput || !answerSubmit || !msg) {
+      console.error('[GARDEN] Elementos del reto no encontrados en el DOM');
+      return;
+    }
 
     const res = await PortalAPI('challenge');
     if (!res.ok) { showMsg(msg, errorText(res)); return; }
@@ -410,7 +420,4 @@
 
   addEventListener('offline', () => setNetwork(false));
   addEventListener('online', () => setNetwork(true));
-
-  /* Exponer para usar desde el HTML si es necesario */
-  window.submitWatch = submitWatch;
 })();
