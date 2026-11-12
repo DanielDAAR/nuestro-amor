@@ -13,7 +13,7 @@
   const mod = {
     ready: false,
     fetching: false,
-    data: null,
+    data: { owners: [], achievements: [], counts: {}, me: 'kitzya' },
     me: 'kitzya',
     heartbeatCount: 0,
   };
@@ -88,18 +88,12 @@
         setNetwork(false);
         const cached = PortalCache.get(CACHE_KEY);
         if (cached && Array.isArray(cached.owners)) mod.data = cached;
-        else if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
-      } else {
-        if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
       }
       renderGarden();
       renderAchievements();
       await loadChallenge();
     } catch (e) {
       console.error('[GARDEN] Error en load():', e);
-      if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
-      renderGarden();
-      renderAchievements();
     } finally {
       mod.fetching = false;
     }
@@ -419,7 +413,4 @@
 
   addEventListener('offline', () => setNetwork(false));
   addEventListener('online', () => setNetwork(true));
-
-  /* Exponer para usar desde el HTML si es necesario */
-  window.submitWatch = submitWatch;
 })();
