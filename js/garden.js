@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
    GARDEN · jardín compartido, logros y reto de la semana (pestaña Jardín)
-   Reutiliza .garden/.flower/.grown de css/home.css y base.css.
    IIFE: no declara nada en el scope global.
    ════════════════════════════════════════════════════════════ */
 (function () {
@@ -116,6 +115,12 @@
     const flowers = Math.floor(owners.length / 3);
 
     ground.textContent = '';
+
+    if (!owners.length) {
+      countEl.textContent = '0 flores · 0 puntos';
+      return;
+    }
+
     const visible = owners.slice(0, 60 * 3);
     visible.forEach((owner, i) => {
       const colors = FLOWER_COLORS[i % FLOWER_COLORS.length];

@@ -1,9 +1,7 @@
-/* ════════════════════════════════════════════════════════════════════════════════
-   GARDEN · pestaña "Jardín"
-   (reutiliza .ios-card, .group-header, .stack, .field-label,
-   .input, .form-actions, .form-msg de css/portal.css y css/base.css,
-   y .garden/.flower/.grown de css/home.css)
-   ═════════════════════════════════════════════════════════════════════════════════════ */
+/* ═════════════════════════════════════════════════════════════════════════
+   GARDEN · pestaña "Jardín" · flores SVG animadas
+   (reutiliza .ios-card, .group-header, .stack, .field-label de css/portal.css y css/base.css)
+   ═══════════════════════════════════════════════════════════════════════════════ */
 
  /* ── jardín compartido ── */
  .garden-shared{
@@ -16,8 +14,6 @@
  }
  .flower{
    width:46px;height:46px;flex:none;
-   transform:scale(.6) translateY(10px);opacity:0;
-   transition:transform .5s var(--spring), opacity .4s var(--spring-soft);
    filter:drop-shadow(0 4px 8px rgba(0,0,0,.12));
  }
  .flower.grown{transform:none;opacity:1}
