@@ -239,6 +239,8 @@
   async function submitWatch(e) {
     e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
 
     console.log('[CINEMA] submitWatch iniciado');
 
@@ -359,4 +361,7 @@
 
   addEventListener('offline', () => setNetwork(false));
   addEventListener('online', () => setNetwork(true));
+
+  /* Exponer para usar desde el HTML si es necesario */
+  window.submitWatch = submitWatch;
 })();
