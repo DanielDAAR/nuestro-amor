@@ -236,6 +236,8 @@
   }
 
   /* ── escritura ── */
+  let watchTitleValue = '';
+
   async function submitWatch(e) {
     if (e) {
       e.preventDefault();
@@ -244,7 +246,7 @@
 
     console.log('[CINEMA] submitWatch iniciado');
 
-    const title = ($('#watchTitle') ? $('#watchTitle').value : '').trim();
+    const title = watchTitleValue.trim();
     console.log('[CINEMA] Título ingresado:', '"' + title + '"');
     if (!title) { showMsg($('#watchMsg'), 'Escribe un título.'); return; }
 
@@ -267,7 +269,8 @@
       showMsg($('#watchMsg'), errorText(res));
       return;
     }
-    if ($('#watchTitle')) $('#watchTitle').value = '';
+    $('#watchTitle').value = '';
+    watchTitleValue = '';
     showMsg($('#watchMsg'), '');
     showMsg($('#watchMsg'), 'Guardado');
     setTimeout(() => { showMsg($('#watchMsg'), ''); }, 1500);
@@ -287,6 +290,13 @@
         e.preventDefault();
         e.stopPropagation();
         submitWatch(e);
+      });
+    }
+
+    const watchTitleInput = $('#watchTitle');
+    if (watchTitleInput) {
+      watchTitleInput.addEventListener('input', (e) => {
+        watchTitleValue = e.target.value.trim();
       });
     }
 
