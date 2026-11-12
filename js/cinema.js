@@ -237,10 +237,10 @@
 
   /* ── escritura ── */
   async function submitWatch(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.preventDefault();
-    e.stopPropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
     console.log('[CINEMA] submitWatch iniciado');
 
@@ -286,7 +286,7 @@
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        submitWatch();
+        submitWatch(e);
       });
     }
 
