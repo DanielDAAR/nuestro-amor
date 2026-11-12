@@ -263,6 +263,7 @@
     showMsg($('challengeMsg'), 'Guardado');
     setTimeout(() => { showMsg($('challengeMsg'), ''); }, 1500);
     await loadChallenge();
+    await load();
   }
 
   async function submitAnswer(e) {
@@ -287,6 +288,7 @@
     if (photoInput) photoInput.value = '';
     if (noteInput) noteInput.value = '';
     await loadChallenge();
+    await load();
   }
 
   async function compressAndUpload(file, note) {

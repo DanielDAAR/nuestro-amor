@@ -241,6 +241,8 @@
     if (!res.ok) { showMsg($('#watchMsg'), errorText(res)); return; }
     if ($('#watchTitle')) $('#watchTitle').value = '';
     showMsg($('#watchMsg'), '');
+    showMsg($('#watchMsg'), 'Guardado');
+    setTimeout(() => { showMsg($('#watchMsg'), ''); }, 1500);
     await load();
   }
 
