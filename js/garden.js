@@ -76,10 +76,9 @@
   async function load() {
     if (!mod.ready || mod.fetching) return;
     mod.fetching = true;
-    console.log('[GARDEN] Cargando jardín...');
     try {
       const res = await PortalAPI('garden');
-      console.log('[GARDEN] Respuesta API:', res.status, res.data ? res.data.owners ? res.data.owners.length : 0 : 'sin datos');
+      console.log('[GARDEN] GET garden respuesta:', res.status, res.data ? res.data.owners ? res.data.owners.length : 0 : null);
       if (res.ok && res.data && Array.isArray(res.data.owners)) {
         mod.data = res.data;
         mod.data.me = mod.me;
@@ -88,12 +87,8 @@
       } else if (res.status === 0) {
         setNetwork(false);
         const cached = PortalCache.get(CACHE_KEY);
-        if (cached && Array.isArray(cached.owners)) {
-          mod.data = cached;
-          console.log('[GARDEN] Usando caché:', cached.owners.length, 'flores');
-        } else if (!mod.data || !Array.isArray(mod.data.owners)) {
-          mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
-        }
+        if (cached && Array.isArray(cached.owners)) mod.data = cached;
+        else if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
       } else {
         if (!mod.data || !Array.isArray(mod.data.owners)) mod.data = { owners: [], achievements: [], counts: {}, me: mod.me };
       }
@@ -114,16 +109,11 @@
   function renderGarden() {
     const ground = document.getElementById('gardenShared');
     const countEl = document.getElementById('gardenCount');
-    if (!ground || !countEl) {
-      console.error('[GARDEN] No se encontró #gardenShared o #gardenCount en el DOM');
-      return;
-    }
+    if (!ground || !countEl) return;
 
     const data = mod.data;
     const owners = data && Array.isArray(data.owners) ? data.owners : [];
     const flowers = Math.floor(owners.length / 3);
-
-    console.log('[GARDEN] Renderizando jardín con', owners.length, 'dueños,', flowers, 'flores');
 
     ground.textContent = '';
     const visible = owners.slice(0, 60 * 3);
@@ -146,6 +136,8 @@
       ground.appendChild(svg);
     });
 
+    // Quitar "y N más" anteriores antes de agregar uno nuevo
+    document.querySelectorAll('.garden-extra').forEach((n) => n.remove());
     if (owners.length > 180) {
       const resto = Math.floor((owners.length - 180) / 3);
       const extra = el('p', 'garden-extra', 'y ' + resto + ' más');
@@ -187,7 +179,7 @@
     const form = $('#challengePromptForm');
     const input = $('#challengePromptInput');
     const submit = $('#challengePromptSubmit');
-    const answerBox = document.getElementById('challenge-answer');
+    const answerBox = document.getElementById('challengeAnswerBox');
     const photoInput = $('#challengePhoto');
     const noteInput = $('#challengeNote');
     const answerSubmit = $('#challengeAnswerSubmit');
@@ -354,8 +346,9 @@
         ctx.drawImage(img, 0, 0, w, h);
         const tryQuality = (q) => {
           const mime = file.type === 'image/png' ? 'image/jpeg' : file.type;
+          const header = 'data:' + mime + ';base64,';
           const data = canvas.toDataURL(mime, q);
-          const bytes = Math.round((data.length - 'data:' + mime + ';base64,'.length) * 3 / 4);
+          const bytes = Math.round((data.length - header.length) * 3 / 4);
           if (bytes <= 1.5 * 1024 * 1024) return data;
           return null;
         };
@@ -420,4 +413,7 @@
 
   addEventListener('offline', () => setNetwork(false));
   addEventListener('online', () => setNetwork(true));
+
+  /* Exponer para usar desde el HTML si es necesario */
+  window.submitWatch = submitWatch;
 })();
